@@ -3,12 +3,18 @@ name:          "MEMOIR.md"
 description:   "架構決策紀錄與經驗教訓"
 created_date:  "2026/06/15 16:55:00"
 modified_date: "2026/06/16 10:00:00"
-project_version: "2.2.1"
-document_version: "1.1.0"
-agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free']
+project_version: "2.2.2"
+document_version: "2.0.1"
+agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free','gemini cli/current_agent']
 ---
 
 # 架構決策紀錄 (MEMOIR)
+
+## 2026-06-16: Cron Scan 異步化處理
+- **問題**: `/api/cron/scan` 執行 30 天掃描需約 60 秒，導致外部 Cron 服務（30s 限制）頻繁超時失敗。
+- **解決**: 使用 FastAPI `BackgroundTasks`。
+- **效益**: 立即釋放 HTTP 連線，爬蟲在背景持續運行，兼顧穩定性與禮貌抓取。
+
 
 ## 技術選擇
 

@@ -3,12 +3,19 @@ name:          "CHANGELOG.md"
 description:   "合歡山松雪樓空房查詢工具 — 版本變更紀錄"
 created_date:  "2026/06/15 16:30:00"
 modified_date: "2026/06/16 12:30:00"
-project_version: "2.2.1"
-document_version: "2.1.1"
-agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free']
+project_version: "2.2.2"
+document_version: "2.1.2"
+agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free','gemini cli/current_agent']
 ---
 
 # 版本變更紀錄
+
+## v2.2.2 (2026-06-16)
+
+### 🚀 優化 — /api/cron/scan 非同步化
+- 修正外部 Cron-job 呼叫超時問題（Render/Cron-job.org 30s 限制）
+- 引入 FastAPI `BackgroundTasks`：接收請求後立即回傳 `200 Accepted`，並於背景執行 30 天完整掃描
+- 維護爬蟲禮貌延遲（1.5s/day）的同時，確保排程任務不因等待而失敗
 
 ## v2.2.1 (2026-06-16)
 

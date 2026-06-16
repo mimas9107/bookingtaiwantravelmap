@@ -192,22 +192,36 @@ async def api_scan_stream(request: Request, start: str = Query(...), end: str = 
 
 # ── 排程掃描（給外部 cron-job.org 調用） ──
 
-@app.get("/api/cron/scan")
-async def api_cron_scan():
+async def run_full_scan():
+    """背景執行完整掃描並儲存至 DB"""
     today = datetime.now()
+    # 掃描明天起算 30 天
     start = (today + timedelta(days=1)).strftime("%Y-%m-%d")
     end = (today + timedelta(days=30)).strftime("%Y-%m-%d")
+    logger.info(f"[Cron] Starting background scan from {start} to {end}")
     try:
         results = await scraper.scan(start, end)
         for r in results:
-            await db.save(r["date"], r.get("available", False), r.get("room_count", 0), r.get("rooms"))
-        return {
-            "status": "ok",
-            "scanned": len(results),
-            "available_days": sum(1 for r in results if r.get("available")),
-        }
+            await db.save(
+                r["date"], 
+                r.get("available", False), 
+                r.get("room_count", 0), 
+                r.get("rooms")
+            )
+        logger.info(f"[Cron] Background scan completed: {len(results)} days processed")
     except Exception as e:
-        raise HTTPException(503, f"掃描失敗: {e}")
+        logger.error(f"[Cron] Background scan failed: {e}")
+
+
+@app.get("/api/cron/scan")
+async def api_cron_scan(background_tasks: BackgroundTasks):
+    # 立即觸發背景任務
+    background_tasks.add_task(run_full_scan)
+    return {
+        "status": "accepted",
+        "message": "Scan task started in background",
+        "timestamp": datetime.now(timezone.utc).isoformat()
+    }
 
 
 # ── 單日房型（即時查詢，不存 DB） ──
