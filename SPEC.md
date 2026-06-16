@@ -2,10 +2,10 @@
 name:          "SPEC.md"
 description:   "合歡山松雪樓訂房查詢工具 — 專案規格書"
 created_date:  "2026/06/15 16:55:00"
-modified_date: "2026/06/15 16:55:00"
-project_version: "2.0.0"
-document_version: "1.0.0"
-agent_sign: ['human/name','opencode/big-pickle']
+modified_date: "2026/06/16 10:00:00"
+project_version: "2.0.2"
+document_version: "1.1.0"
+agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free']
 ---
 
 # 專案規格書
@@ -72,7 +72,7 @@ agent_sign: ['human/name','opencode/big-pickle']
 | 儲存位置 | `dashboard/data/scans.db` |
 | 表格 | `scans`（date, available, room_count, scanned_at） |
 | 更新策略 | 即時查詢或排程查詢時 INSERT OR REPLACE |
-| 生命週期 | Render 實例存活期間持久；重啟後可能清空 |
+| 生命週期 | Render 實例存活期間持久；重啟後可能清空；支援下載備份與上傳還原 |
 
 ### 4.3 前端狀態覆蓋
 
@@ -112,6 +112,17 @@ SSE 串流。事件：
 
 ### `GET /api/scan?start=...&end=...`
 （相容）同 scan-stream 但回傳完整 JSON array。
+
+### `GET /api/db/export`
+下載 SQLite 資料庫。回傳 `application/octet-stream`，檔名 `songxuelou_scans_YYYYMMDD.db`。
+
+### `POST /api/db/import`
+上傳 `.db` 檔案取代目前資料庫。需滿足：
+- 有效的 SQLite 格式（magic header 驗證）
+- 包含 `scans` 資料表
+
+成功時回傳 `{"status": "ok", "rows": N, "message": "..."}`。
+格式錯誤或缺少資料表時回傳 `400`。
 
 ## 6. 部署架構
 

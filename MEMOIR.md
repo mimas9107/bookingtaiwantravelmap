@@ -2,10 +2,10 @@
 name:          "MEMOIR.md"
 description:   "架構決策紀錄與經驗教訓"
 created_date:  "2026/06/15 16:55:00"
-modified_date: "2026/06/15 16:55:00"
-project_version: "2.0.0"
-document_version: "1.0.0"
-agent_sign: ['human/name','opencode/big-pickle']
+modified_date: "2026/06/16 10:00:00"
+project_version: "2.0.2"
+document_version: "1.1.0"
+agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free']
 ---
 
 # 架構決策紀錄 (MEMOIR)
@@ -74,6 +74,6 @@ Step 2（選房型）是 POST 請求，需攜帶 `__VIEWSTATE`、`__EVENTVALIDAT
 ## 已知限制
 
 - SQLite 非網絡資料庫，不支援多實例（Render 免費方案僅單實例，無影響）
-- Render 重啟或搬遷時 SQLite 資料清空（ephemeral filesystem）
+- Render 重啟或搬遷時 SQLite 資料清空（ephemeral filesystem）；解決方式：透過 `/api/db/export` 下載備份，重啟後再 `/api/db/import` 還原
 - 掃描 30 天約需 60 秒（受限於反爬蟲間隔），無法加速
 - 金流付款需真人操作（第三方頁面 3D 驗證）

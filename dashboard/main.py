@@ -3,11 +3,11 @@ import json
 import time
 from datetime import datetime, timedelta
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Query, HTTPException, Request
-from fastapi.responses import HTMLResponse, StreamingResponse
+from fastapi import FastAPI, Query, HTTPException, Request, UploadFile, File
+from fastapi.responses import HTMLResponse, StreamingResponse, FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from scraper import BookingScraper
-from database import Database
+from database import Database, DB_PATH
 
 scraper: BookingScraper | None = None
 db: Database | None = None
@@ -146,6 +146,38 @@ async def api_scan(start: str = Query(...), end: str = Query(...)):
         return {"data": data}
     except Exception as e:
         raise HTTPException(503, f"查詢失敗: {e}")
+
+
+# ── 資料庫匯出/匯入（online 抽換） ──
+
+@app.get("/api/db/export")
+async def api_db_export():
+    backup_path = await db.export_backup()
+    if backup_path is None:
+        raise HTTPException(404, "資料庫不存在")
+    today = datetime.now().strftime("%Y%m%d")
+    filename = f"songxuelou_scans_{today}.db"
+    try:
+        with open(backup_path, "rb") as f:
+            content = f.read()
+    finally:
+        if os.path.exists(backup_path):
+            os.unlink(backup_path)
+    return Response(
+        content=content,
+        media_type="application/octet-stream",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
+@app.post("/api/db/import")
+async def api_db_import(file: UploadFile = File(...)):
+    data = await file.read()
+    try:
+        count = await db.import_db(data)
+        return {"status": "ok", "rows": count, "message": f"已匯入 {count} 筆資料"}
+    except ValueError as e:
+        raise HTTPException(400, str(e))
 
 
 if __name__ == "__main__":

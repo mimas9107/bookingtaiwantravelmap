@@ -140,6 +140,22 @@ header p { font-size: 0.85rem; opacity: .85; margin-top: .25rem; }
 .room-row .rstatus.avail { color: var(--green); }
 .room-row .rstatus.sold { color: var(--red); }
 
+.db-tools {
+  display: flex; align-items: center; gap: .5rem; flex-wrap: wrap;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: .6rem 1rem; margin-top: 1rem;
+  font-size: .8rem;
+}
+.db-tools-label { color: var(--muted); font-weight: 600; margin-right: .25rem; }
+.db-tools button {
+  background: #f1f5f9; border: 1px solid var(--border); border-radius: 6px;
+  padding: .3rem .7rem; cursor: pointer; font-size: .8rem; transition: background .15s;
+}
+.db-tools button:hover { background: #e2e8f0; }
+.db-tools-status { color: var(--muted); font-size: .75rem; margin-left: .25rem; }
+.db-tools-status.ok { color: var(--green); }
+.db-tools-status.err { color: var(--red); }
+
 @media (max-width: 600px) {
   header h1 { font-size: 1.1rem; }
   .controls { flex-direction: column; }

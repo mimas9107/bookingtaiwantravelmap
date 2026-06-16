@@ -2,13 +2,36 @@
 name:          "CHANGELOG.md"
 description:   "合歡山松雪樓訂房工具 — 版本變更紀錄"
 created_date:  "2026/06/15 16:30:00"
-modified_date: "2026/06/15 16:55:00"
-project_version: "2.0.0"
-document_version: "2.0.0"
-agent_sign: ['human/name','opencode/big-pickle']
+modified_date: "2026/06/16 10:00:00"
+project_version: "2.0.2"
+document_version: "2.0.2"
+agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free']
 ---
 
 # 版本變更紀錄
+
+## v2.0.2 (2026-06-16)
+
+### 🔧 修正 — 資料庫 concurrent 安全與 CLI 工具
+- `database.py`: 新增 `threading.Lock` 保護匯入時檔案置換區段，防止與 `_save()` 競搶
+- `database.py`: 匯出改為 `src.backup(dst)` API，確保 WAL 資料一併寫入快照
+- `main.py`: 匯出端點讀取 temp backup → 記憶體 → 清除，無殘留
+- `scripts/db_tool.py` 新增：純 `urllib` 零依賴，支援 `download`/`upload`/`info` 子命令
+
+---
+
+## v2.0.1 (2026-06-16)
+
+### 🚀 新增 — 資料庫線上抽換
+- `GET /api/db/export` — 下載 SQLite 資料庫檔案
+- `POST /api/db/import` — 上傳 `.db` 檔案取代目前資料庫（含格式驗證）
+- 前端底部「資料庫」工具列：下載 / 上傳按鈕 + 狀態提示
+- `database.py` 新增 `export_path()` / `import_db()` 方法（synchronous 執行緒安全）
+
+### 🔧 修正
+- Render 重啟後資料遺失問題緩解：使用者可手動下載備份 DB
+
+---
 
 ## v2.0.0 (2026-06-15)
 

@@ -2,10 +2,10 @@
 name:          "README.md"
 description:   "合歡山松雪樓訂房查詢工具 — 使用說明"
 created_date:  "2026/06/15 14:01:53"
-modified_date: "2026/06/15 16:55:00"
-project_version: "2.0.0"
-document_version: "2.0.0"
-agent_sign: ['human/name','opencode/big-pickle']
+modified_date: "2026/06/16 10:00:00"
+project_version: "2.0.2"
+document_version: "2.0.2"
+agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free']
 ---
 
 # 合歡山松雪樓 訂房查詢工具

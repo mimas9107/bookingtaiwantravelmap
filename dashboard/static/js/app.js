@@ -287,6 +287,54 @@ function doSearch() {
   doSearchSSE(start, end);
 }
 
+// ── 資料庫匯出 / 匯入 ──
+
+const dbExportBtn = $('dbExportBtn');
+const dbImportBtn = $('dbImportBtn');
+const dbFileInput = $('dbFileInput');
+const dbToolsStatus = $('dbToolsStatus');
+
+function dbStatus(msg, type) {
+  dbToolsStatus.textContent = msg;
+  dbToolsStatus.className = 'db-tools-status' + (type ? ' ' + type : '');
+}
+
+dbExportBtn.addEventListener('click', () => {
+  const a = document.createElement('a');
+  a.href = '/api/db/export';
+  a.download = '';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  dbStatus('已觸發下載', 'ok');
+});
+
+dbImportBtn.addEventListener('click', () => dbFileInput.click());
+
+dbFileInput.addEventListener('change', async () => {
+  const file = dbFileInput.files[0];
+  if (!file) return;
+  if (!file.name.endsWith('.db')) {
+    dbStatus('請選擇 .db 檔案', 'err');
+    dbFileInput.value = '';
+    return;
+  }
+  dbStatus('上傳中…');
+  const fd = new FormData();
+  fd.append('file', file);
+  try {
+    const r = await fetch('/api/db/import', { method: 'POST', body: fd });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.detail || j.message || '匯入失敗');
+    dbStatus(`✅ 匯入成功（${j.rows} 筆），重新載入…`, 'ok');
+    dbFileInput.value = '';
+    setTimeout(() => location.reload(), 1200);
+  } catch (e) {
+    dbStatus(`❌ ${e.message}`, 'err');
+    dbFileInput.value = '';
+  }
+});
+
 initDates();
 prevBtn.addEventListener('click', () => navigateMonth(-1));
 nextBtn.addEventListener('click', () => navigateMonth(1));

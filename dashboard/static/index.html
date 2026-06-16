@@ -64,6 +64,14 @@
     </div>
     <div class="dp-body" id="detailBody"></div>
   </div>
+
+  <div class="db-tools">
+    <span class="db-tools-label">&#x1F4BE; 資料庫</span>
+    <button id="dbExportBtn" title="下載 scans.db">&#x2B07; 下載</button>
+    <button id="dbImportBtn" title="上傳 .db 取代目前資料庫">&#x2B06; 上傳</button>
+    <input type="file" id="dbFileInput" accept=".db" style="display:none">
+    <span class="db-tools-status" id="dbToolsStatus"></span>
+  </div>
 </div>
 
 <script src="/static/js/app.js"></script>
