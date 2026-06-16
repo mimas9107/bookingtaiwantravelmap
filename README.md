@@ -3,7 +3,7 @@ name:          "README.md"
 description:   "合歡山松雪樓訂房查詢工具 — 使用說明"
 created_date:  "2026/06/15 14:01:53"
 modified_date: "2026/06/16 10:00:00"
-project_version: "2.1.1"
+project_version: "2.1.2"
 document_version: "2.0.2"
 agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free']
 ---
@@ -91,7 +91,7 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 | **房型明細** | 點日期查看該日各房型可訂狀態 |
 | **排程更新** | `/api/cron/scan` 可供 cron-job.org 定時觸發，自動掃描 30 天 |
 | **Telegram Bot** | webhook 整合，支援 `查 7/1`、`查 7/1~7/5`、`最近狀況` 等自然語言指令 |
-| **Keepalive** | `/api/ping` 回傳 timestamp + client IP；內建 120 秒自動心跳防 spin down |
+| **Keepalive** | `/api/ping` 回傳 timestamp + client IP；設定 `HEARTBEAT_URL` 後背景 120 秒向外敲 API 防 spin down |
 
 ### 快取行為
 
@@ -112,13 +112,14 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 # 5. Start Command: uvicorn main:app --host 0.0.0.0 --port $PORT
 ```
 
-部署後，在 cron-job.org 建立以下排程：
+部署後建議在 cron-job.org 建立以下排程：
 
 | 排程 | URL | 用途 |
 |------|-----|------|
-| 每 10 分鐘 | `https://你的專案.onrender.com/api/ping` | Keepalive |
 | 每日 08:00 | `https://你的專案.onrender.com/api/cron/scan` | 早上更新快取 |
 | 每日 20:00 | `https://你的專案.onrender.com/api/cron/scan` | 晚上更新快取 |
+
+若已設定 `HEARTBEAT_URL` 環境變數，服務會自行每 120 秒向外敲 API，可省略 cron-job.org 的 keepalive 排程。心跳失敗時自動降低頻率（最長 300 秒間隔）並記錄 warning。
 
 ## 注意事項
 

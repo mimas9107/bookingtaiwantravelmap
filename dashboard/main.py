@@ -2,6 +2,7 @@ import os
 import json
 import time
 import asyncio
+import logging
 from datetime import datetime, timedelta, timezone
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Query, HTTPException, Request, UploadFile, File
@@ -12,21 +13,46 @@ from scraper import BookingScraper
 from database import Database, DB_PATH
 from bot import telegram as bot
 
+logger = logging.getLogger("uvicorn")
+
 scraper: BookingScraper | None = None
 db: Database | None = None
 BOT_ENABLED = bool(os.environ.get("TELEGRAM_TOKEN"))
 _heartbeat_task: asyncio.Task | None = None
 
+HB_BASE = (os.environ.get("HEARTBEAT_URL") or "").rstrip("/")
+HB_OK_INTERVAL = 120
+HB_MIN_INTERVAL = 30
+HB_MAX_INTERVAL = 300
+HB_CONSECUTIVE_WARN = 3
 
-async def _heartbeat_loop(port: int):
-    url = f"http://127.0.0.1:{port}/api/ping"
+
+async def _heartbeat_loop():
+    if not HB_BASE:
+        logger.info("heartbeat disabled (no HEARTBEAT_URL)")
+        return
+    url = f"{HB_BASE}/api/ping"
+    interval = HB_OK_INTERVAL
+    failures = 0
     async with AsyncClient() as c:
         while True:
-            await asyncio.sleep(120)
+            await asyncio.sleep(interval)
             try:
-                await c.get(url, timeout=5.0)
-            except Exception:
-                pass
+                r = await c.get(url, timeout=10.0)
+                r.raise_for_status()
+                if failures > 0:
+                    logger.info(f"heartbeat recovered after {failures} failures")
+                failures = 0
+                interval = HB_OK_INTERVAL
+            except Exception as exc:
+                failures += 1
+                interval = min(HB_MAX_INTERVAL, interval * 2)
+                interval = max(interval, HB_MIN_INTERVAL)
+                if failures == 1 or failures % HB_CONSECUTIVE_WARN == 0:
+                    logger.warning(
+                        f"heartbeat failed ({failures}x): {exc.__class__.__name__}; "
+                        f"next in {interval}s"
+                    )
 
 
 @asynccontextmanager
@@ -35,13 +61,12 @@ async def lifespan(app: FastAPI):
     scraper = BookingScraper()
     db = Database()
     await db.init()
-    port = int(os.environ.get("PORT", "8000"))
-    _heartbeat_task = asyncio.create_task(_heartbeat_loop(port))
+    _heartbeat_task = asyncio.create_task(_heartbeat_loop())
     if BOT_ENABLED:
         public_url = os.environ.get("PUBLIC_URL", "")
         if public_url:
             ok = await bot.set_webhook(public_url)
-            print(f"Telegram webhook set: {ok}")
+            logger.info(f"Telegram webhook set: {ok}")
     yield
     if _heartbeat_task:
         _heartbeat_task.cancel()
