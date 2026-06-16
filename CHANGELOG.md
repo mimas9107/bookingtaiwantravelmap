@@ -2,13 +2,21 @@
 name:          "CHANGELOG.md"
 description:   "合歡山松雪樓訂房工具 — 版本變更紀錄"
 created_date:  "2026/06/15 16:30:00"
-modified_date: "2026/06/16 10:00:00"
-project_version: "2.1.2"
-document_version: "2.0.2"
+modified_date: "2026/06/16 11:10:00"
+project_version: "2.1.3"
+document_version: "2.0.3"
 agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free']
 ---
 
 # 版本變更紀錄
+
+## v2.1.3 (2026-06-16)
+
+### 📦 維護 — 將 songxuelou-skill 遷入專案
+- skill 從 `~/.agents/skills/songxuelou-skill/` 遷入 `agents/songxuelou-skill/`，納入版控
+- `~/.agents/skills/` 以 symlink 指向專案內路徑
+
+---
 
 ## v2.1.2 (2026-06-16)
 
