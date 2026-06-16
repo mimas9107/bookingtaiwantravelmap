@@ -9,9 +9,9 @@ from fastapi import FastAPI, Query, HTTPException, Request, UploadFile, File
 from fastapi.responses import HTMLResponse, StreamingResponse, FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from httpx import AsyncClient
-from scraper import BookingScraper
-from database import Database, DB_PATH
-from bot import telegram as bot
+from dashboard.scraper import BookingScraper
+from dashboard.database import Database, DB_PATH
+from dashboard.bot import telegram as bot
 
 logger = logging.getLogger("uvicorn")
 
