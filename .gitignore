@@ -1,0 +1,36 @@
+# ── 個人資料 ──
+.env
+continue.txt
+
+# ── Python ──
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# ── SQLite 資料庫 ──
+data/
+*.db
+*.db-wal
+*.db-shm
+
+# ── Session / 暫存 ──
+*.log
+*.tmp
+
+# ── IDE ──
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── OS ──
+.DS_Store
+Thumbs.db
+.bak
+
+# environment
+.venv/
+node_modules/
+

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>合歡山松雪樓 · 空房查詢</title>
+<link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<header>
+  <h1>&#x1F3D4;&#xFE0F; 合歡山松雪樓 · 空房查詢</h1>
+  <p>資料來源：booking.taiwantravelmap.com</p>
+</header>
+
+<div class="container">
+  <div class="controls">
+    <label>入住日期</label>
+    <input type="date" id="startDate">
+    <label>退房日期</label>
+    <input type="date" id="endDate">
+    <button id="searchBtn">&#x1F50D; 查詢</button>
+    <div class="range-hint">可訂範圍：明天 ~ 30 天後</div>
+  </div>
+
+  <div class="cache-badge" id="cacheBadge" style="display:none">
+    <span>&#x1F504; 上次查詢: <span id="lastScanTime"></span></span>
+  </div>
+
+  <div class="progress-wrap" id="progressWrap">
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <span class="progress-text" id="progressText"></span>
+  </div>
+
+  <div class="status" id="status"></div>
+
+  <div class="calendar-wrap" id="calendarWrap" style="display:none">
+    <div class="calendar-header">
+      <span id="monthLabel"></span>
+      <div class="calendar-nav">
+        <button id="prevMonth">&lsaquo;</button>
+        <button id="nextMonth">&rsaquo;</button>
+      </div>
+    </div>
+    <div class="calendar-grid" id="calendarGrid">
+      <div class="day-name">日</div><div class="day-name">一</div>
+      <div class="day-name">二</div><div class="day-name">三</div>
+      <div class="day-name">四</div><div class="day-name">五</div>
+      <div class="day-name">六</div>
+    </div>
+    <div class="legend">
+      <span><span style="color:var(--green)">●</span> 有空房</span>
+      <span><span style="color:var(--red)">&#x2715;</span> 已售完</span>
+      <span><span style="color:var(--amber)">&#x25CC;</span> 未查詢</span>
+    </div>
+  </div>
+
+  <div class="detail-panel" id="detailPanel">
+    <div class="dp-header">
+      <span id="detailDate"></span>
+      <span id="detailStatus"></span>
+    </div>
+    <div class="dp-body" id="detailBody"></div>
+  </div>
+</div>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>

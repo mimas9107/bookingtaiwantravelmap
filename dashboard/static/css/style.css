@@ -1,0 +1,150 @@
+:root {
+  --green: #22c55e; --red: #ef4444; --amber: #f59e0b;
+  --bg: #f8fafc; --card: #fff; --border: #e2e8f0;
+  --text: #1e293b; --muted: #64748b;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg); color: var(--text); min-height: 100vh;
+}
+header {
+  background: linear-gradient(135deg, #1e40af, #3b82f6);
+  color: #fff; padding: 1.5rem 1rem; text-align: center;
+}
+header h1 { font-size: 1.4rem; font-weight: 700; }
+header p { font-size: 0.85rem; opacity: .85; margin-top: .25rem; }
+.container { max-width: 960px; margin: 0 auto; padding: 1rem; }
+
+.controls {
+  display: flex; gap: .5rem; flex-wrap: wrap; align-items: center;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 1rem; margin-bottom: .5rem;
+}
+.controls label { font-size: .85rem; color: var(--muted); }
+.controls input[type=date] {
+  padding: .4rem .6rem; border: 1px solid var(--border);
+  border-radius: 6px; font-size: .9rem; flex: 1; min-width: 130px;
+}
+.controls button {
+  background: #3b82f6; color: #fff; border: none; border-radius: 6px;
+  padding: .5rem 1.2rem; font-size: .9rem; cursor: pointer;
+  font-weight: 600; transition: background .15s;
+}
+.controls button:hover { background: #2563eb; }
+.controls button:disabled { opacity: .5; cursor: not-allowed; }
+.range-hint { width: 100%; font-size: .75rem; color: var(--muted); margin-top: .25rem; }
+
+.cache-badge {
+  display: flex; align-items: center; gap: .5rem; justify-content: center;
+  font-size: .8rem; color: var(--muted); margin-bottom: .75rem;
+  padding: .35rem .75rem; background: var(--card);
+  border: 1px solid var(--border); border-radius: 20px;
+  width: fit-content; margin-left: auto; margin-right: auto;
+}
+.cache-badge .fresh { color: var(--green); font-weight: 600; }
+.cache-badge .stale { color: var(--amber); font-weight: 600; }
+
+.progress-wrap {
+  display: flex; align-items: center; gap: .75rem;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: .5rem 1rem; margin-bottom: 1rem;
+  display: none;
+}
+.progress-wrap.active { display: flex; }
+.progress-bar {
+  flex: 1; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: linear-gradient(90deg, #3b82f6, #22c55e);
+  border-radius: 4px; transition: width .3s ease; width: 0%;
+}
+.progress-text { font-size: .8rem; color: var(--muted); white-space: nowrap; }
+
+.status {
+  padding: .75rem 1rem; border-radius: 8px; margin-bottom: 1rem;
+  font-size: .9rem; display: none;
+}
+.status.loading { display: block; background: #eff6ff; color: #1d4ed8; }
+.status.error { display: block; background: #fef2f2; color: #dc2626; }
+.status.empty { display: block; background: #f0fdf4; color: #16a34a; }
+
+.calendar-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.calendar-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .75rem 1rem; background: #f1f5f9; font-weight: 700;
+}
+.calendar-nav { display: flex; gap: .5rem; }
+.calendar-nav button {
+  background: none; border: 1px solid var(--border); border-radius: 6px;
+  padding: .3rem .7rem; cursor: pointer; font-size: .9rem;
+}
+.calendar-nav button:hover { background: #e2e8f0; }
+.calendar-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr);
+  gap: 2px; padding: .5rem;
+}
+.day-name {
+  text-align: center; font-size: .75rem; font-weight: 600;
+  color: var(--muted); padding: .5rem 0; text-transform: uppercase;
+}
+.day-cell {
+  aspect-ratio: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  border-radius: 8px; cursor: pointer; position: relative;
+  font-size: .85rem; font-weight: 500; transition: all .15s;
+  min-height: 56px;
+}
+.day-cell:hover { transform: scale(1.05); z-index: 1; }
+.day-cell.outside { opacity: .3; cursor: default; }
+.day-cell.outside:hover { transform: none; }
+.day-cell.available { background: #dcfce7; color: #166534; }
+.day-cell.available:hover { box-shadow: 0 0 0 2px var(--green); }
+.day-cell.soldout { background: #fef2f2; color: #991b1b; }
+.day-cell.soldout:hover { box-shadow: 0 0 0 2px var(--red); }
+.day-cell.pending { background: #fefce8; color: #92400e; }
+.day-cell.pending:hover { box-shadow: 0 0 0 2px var(--amber); }
+.day-cell.streaming { animation: pulse 1s ease-in-out 3; }
+@keyframes pulse {
+  0%, 100% { box-shadow: none; }
+  50% { box-shadow: 0 0 0 3px #60a5fa; }
+}
+.day-cell.today { font-weight: 700; }
+.day-cell .badge { font-size: .6rem; margin-top: 1px; }
+.day-cell.available .badge { color: var(--green); }
+.day-cell.soldout .badge { color: var(--red); }
+.day-cell.selected { box-shadow: 0 0 0 3px #3b82f6 !important; }
+
+.legend { display: flex; gap: 1rem; justify-content: center; padding: .5rem 1rem 1rem; font-size: .8rem; }
+.legend span { display: flex; align-items: center; gap: .3rem; }
+
+.detail-panel {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; margin-top: 1rem; overflow: hidden;
+  display: none;
+}
+.detail-panel.active { display: block; }
+.detail-panel .dp-header {
+  background: #f1f5f9; padding: .75rem 1rem; font-weight: 700;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.detail-panel .dp-body { padding: 1rem; }
+.room-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: .6rem .8rem; border-radius: 8px; margin-bottom: .4rem;
+}
+.room-row.avail { background: #f0fdf4; }
+.room-row.sold { background: #fef2f2; }
+.room-row .rname { font-weight: 500; }
+.room-row .rstatus { font-size: .8rem; font-weight: 600; }
+.room-row .rstatus.avail { color: var(--green); }
+.room-row .rstatus.sold { color: var(--red); }
+
+@media (max-width: 600px) {
+  header h1 { font-size: 1.1rem; }
+  .controls { flex-direction: column; }
+  .controls input[type=date] { width: 100%; }
+  .controls button { width: 100%; }
+  .day-cell { font-size: .75rem; min-height: 44px; }
+  .day-cell .badge { font-size: .55rem; }
+}
