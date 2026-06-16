@@ -125,6 +125,10 @@ function renderCalendar(year, month) {
       cell.classList.add('soldout');
       cell.innerHTML = `${d}<span class="badge">&#x2715;</span>`;
     }
+    if (info && info.changes) {
+      cell.classList.add('changed');
+      cell.title = '🔄 房況有變動';
+    }
 
     if (ds === state.selectedDate) cell.classList.add('selected');
     cell.addEventListener('click', () => onDateClick(ds));
@@ -156,14 +160,28 @@ async function onDateClick(ds) {
     const availCount = info.rooms.filter(r => r.available).length;
     detailStatus.textContent = availCount > 0 ? `✅ ${availCount} 間可訂` : '❌ 已售完';
 
-    detailBody.innerHTML = info.rooms.map(r => `
+    const changes = state.data[ds]?.changes || [];
+    const changeMap = {};
+    changes.forEach(c => { changeMap[c.name] = c; });
+
+    detailBody.innerHTML = info.rooms.map(r => {
+      const c = changeMap[r.name];
+      let changeHtml = '';
+      if (c) {
+        changeHtml = c.from
+          ? `<span class="change-tag taken">⬆ 被訂走</span>`
+          : `<span class="change-tag freed">⬇ 釋出</span>`;
+      }
+      return `
       <div class="room-row ${r.available ? 'avail' : 'sold'}">
         <span class="rname">${r.name}</span>
         <span class="rstatus ${r.available ? 'avail' : 'sold'}">
           ${r.available ? '✅ 可訂' : '❌ 已售完'}
         </span>
+        ${changeHtml}
       </div>
-    `).join('');
+      `;
+    }).join('');
   } catch(e) {
     detailBody.innerHTML = `<p style="color:var(--red)">⚠️ 讀取失敗: ${e.message}</p>`;
   }

@@ -73,14 +73,17 @@ async def handle_update(data: dict, scraper, db):
     try:
         if parsed["action"] == "rooms":
             result = await scraper.rooms(parsed["date"])
-            await send_message(chat_id, formatter.rooms(result))
+            data = await db.get_all()
+            day = next((r for r in data if r["date"] == result["date"]), None)
+            changes = day.get("changes") if day else None
+            await send_message(chat_id, formatter.rooms(result, changes))
 
         elif parsed["action"] == "scan":
             results = await scraper.scan(parsed["start"], parsed["end"])
             for r in results:
                 try:
                     await db.save(
-                        r["date"], r.get("available", False), r.get("room_count", 0)
+                        r["date"], r.get("available", False), r.get("room_count", 0), r.get("rooms")
                     )
                 except Exception:
                     pass

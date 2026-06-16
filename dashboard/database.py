@@ -13,6 +13,23 @@ DB_PATH = os.path.join(DB_DIR, "scans.db")
 _db_lock = threading.Lock()
 
 
+def compute_room_changes(old_rooms, new_rooms):
+    """Compare two room lists and return changes (flipped status only).
+
+    old_rooms / new_rooms: list of {"name": str, "available": bool} or None.
+    Returns list of {"name": str, "from": bool, "to": bool} or None if no change.
+    """
+    if not old_rooms or not new_rooms:
+        return None
+    old_map = {r["name"]: r["available"] for r in old_rooms}
+    changes = []
+    for r in new_rooms:
+        prev = old_map.get(r["name"])
+        if prev is not None and prev != r["available"]:
+            changes.append({"name": r["name"], "from": prev, "to": r["available"]})
+    return changes or None
+
+
 def _conn():
     os.makedirs(DB_DIR, exist_ok=True)
     c = sqlite3.connect(DB_PATH)
@@ -29,18 +46,32 @@ def _init():
             date TEXT PRIMARY KEY,
             available INTEGER NOT NULL DEFAULT 0,
             room_count INTEGER NOT NULL DEFAULT 0,
-            scanned_at TEXT NOT NULL
+            scanned_at TEXT NOT NULL,
+            rooms_json TEXT,
+            changes_json TEXT
         )
     """)
+    for col in ("rooms_json", "changes_json"):
+        try:
+            c.execute(f"ALTER TABLE scans ADD COLUMN {col} TEXT")
+        except Exception:
+            pass
     c.commit()
     c.close()
 
-def _save(date, available, room_count, scanned_at):
+def _save(date, available, room_count, scanned_at, rooms=None):
     c = _conn()
+    rooms_json = json.dumps(rooms, ensure_ascii=False) if rooms else None
+    changes_json = None
+    if rooms:
+        prev = c.execute("SELECT rooms_json FROM scans WHERE date=?", (date,)).fetchone()
+        old_rooms = json.loads(prev["rooms_json"]) if prev and prev["rooms_json"] else None
+        changes = compute_room_changes(old_rooms, rooms)
+        changes_json = json.dumps(changes, ensure_ascii=False) if changes else None
     c.execute("""
-        INSERT OR REPLACE INTO scans (date, available, room_count, scanned_at)
-        VALUES (?, ?, ?, ?)
-    """, (date, int(available), room_count, scanned_at))
+        INSERT OR REPLACE INTO scans (date, available, room_count, scanned_at, rooms_json, changes_json)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (date, int(available), room_count, scanned_at, rooms_json, changes_json))
     c.commit()
     c.close()
 
@@ -48,7 +79,18 @@ def _get_all():
     c = _conn()
     rows = c.execute("SELECT * FROM scans ORDER BY date").fetchall()
     c.close()
-    return [dict(r) for r in rows]
+    result = []
+    for r in rows:
+        d = dict(r)
+        d["available"] = bool(d["available"])
+        if d.get("rooms_json"):
+            d["rooms"] = json.loads(d["rooms_json"])
+        if d.get("changes_json"):
+            d["changes"] = json.loads(d["changes_json"])
+        d.pop("rooms_json", None)
+        d.pop("changes_json", None)
+        result.append(d)
+    return result
 
 def _get_meta():
     c = _conn()
@@ -118,16 +160,14 @@ class Database:
     async def init(self):
         await self._loop.run_in_executor(None, _init)
 
-    async def save(self, date: str, available: bool, room_count: int):
+    async def save(self, date: str, available: bool, room_count: int, rooms: list = None):
         scanned_at = datetime.now(timezone.utc).isoformat(timespec="seconds")
         await self._loop.run_in_executor(
-            None, partial(_save, date, available, room_count, scanned_at)
+            None, partial(_save, date, available, room_count, scanned_at, rooms)
         )
 
     async def get_all(self) -> list:
         rows = await self._loop.run_in_executor(None, _get_all)
-        for r in rows:
-            r["available"] = bool(r["available"])
         return rows
 
     async def get_meta(self) -> dict | None:

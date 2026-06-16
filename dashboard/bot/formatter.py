@@ -25,17 +25,27 @@ def help_text() -> str:
     )
 
 
-def rooms(result: dict) -> str:
+def rooms(result: dict, changes: list = None) -> str:
     ds = result["date"]
     lines = [f"🏔 <b>松雪樓  {ds} ({_wd(ds)})</b>"]
     lines.append("─" * 16)
+    change_map = {c["name"]: c for c in changes} if changes else {}
     for r in result.get("rooms", []):
+        label = NAME_LABEL.get(r["name"], r["name"])
+        c = change_map.get(r["name"])
         if r["available"]:
-            label = NAME_LABEL.get(r["name"], r["name"])
-            lines.append(f"✅ {label}")
+            seg = f"✅ {label}"
+            if c:
+                seg += " ⬇釋出" if not c["from"] else ""
         else:
             label = NAME_LABEL.get(r["name"], r["name"])
-            lines.append(f"❌ <s>{label}</s>")
+            seg = f"❌ <s>{label}</s>"
+            if c:
+                seg += " ⬆被訂" if c["from"] else ""
+        lines.append(seg)
+    if changes:
+        lines.append("─" * 8)
+        lines.append("🔄 較前次掃描有變動")
     return "\n".join(lines)
 
 
@@ -54,11 +64,12 @@ def scan(results: list) -> str:
     for r in results:
         ds = r["date"]
         d = datetime.strptime(ds, "%Y-%m-%d")
+        change_mark = "🔄" if r.get("changes") else ""
         if r["available"]:
             badge = f"✅{r['room_count']}"
         else:
             badge = "❌"
-        row.append(f"{d.month}/{d.day}({_wd(ds)}){badge}")
+        row.append(f"{d.month}/{d.day}({_wd(ds)}){badge}{change_mark}")
 
     lines.extend(row)
     lines.append("")
@@ -89,7 +100,8 @@ def latest(data: list, meta: dict | None) -> str:
     for r in data:
         ds = r["date"]
         d = datetime.strptime(ds, "%Y-%m-%d")
-        row.append(f"{d.month}/{d.day}({_wd(ds)}){'✅' if r['available'] else '❌'}")
+        change_mark = "🔄" if r.get("changes") else ""
+        row.append(f"{d.month}/{d.day}({_wd(ds)}){'✅' if r['available'] else '❌'}{change_mark}")
     lines.extend(row)
     lines.append("")
     avail = sum(1 for r in data if r["available"])

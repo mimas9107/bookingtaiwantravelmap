@@ -3,7 +3,7 @@ name:          "TELEGRAM.md"
 description:   "松雪樓空房查詢 Telegram Bot — 設定與使用說明"
 created_date:  "2026/06/16 11:00:00"
 modified_date: "2026/06/16 11:00:00"
-project_version: "2.1.4"
+project_version: "2.2.0"
 document_version: "1.0.0"
 agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free']
 ---

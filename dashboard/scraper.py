@@ -86,9 +86,10 @@ class BookingScraper:
                         self._search_url(ds),
                         referer=f"{BASE}/user/booking.aspx?m=1156",
                     )
-                    count = len(re.findall(
-                        r'name="RoomListView\$ctl\d+\$btGoOrderCalendar"', html))
-                    return {"date": ds, "available": count > 0, "room_count": count}
+                    parsed = self._parse_rooms(html, ds)
+                    rooms = parsed.get("rooms", [])
+                    parsed["room_count"] = sum(1 for r in rooms if r["available"])
+                    return parsed
                 except Exception as e:
                     return {"date": ds, "available": False, "room_count": 0, "error": str(e)}
 
@@ -108,9 +109,10 @@ class BookingScraper:
                         self._search_url(ds),
                         referer=f"{BASE}/user/booking.aspx?m=1156",
                     )
-                    count = len(re.findall(
-                        r'name="RoomListView\$ctl\d+\$btGoOrderCalendar"', html))
-                    yield {"date": ds, "available": count > 0, "room_count": count}
+                    parsed = self._parse_rooms(html, ds)
+                    rooms = parsed.get("rooms", [])
+                    parsed["room_count"] = sum(1 for r in rooms if r["available"])
+                    yield parsed
                 except asyncio.CancelledError:
                     raise
                 except Exception as e:

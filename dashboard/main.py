@@ -134,12 +134,17 @@ async def api_query(date: str = Query(...), rooms: int = Query(0)):
         result["available"] = day["available"]
         result["room_count"] = day["room_count"]
         result["scanned_at"] = day["scanned_at"]
-    if rooms and day and day["available"]:
-        try:
-            detail = await scraper.rooms(date)
-            result["rooms"] = detail.get("rooms", [])
-        except Exception:
-            pass
+        if "changes" in day and day["changes"]:
+            result["changes"] = day["changes"]
+    if rooms:
+        if day and day.get("rooms"):
+            result["rooms"] = day["rooms"]
+        elif day and day["available"]:
+            try:
+                detail = await scraper.rooms(date)
+                result["rooms"] = detail.get("rooms", [])
+            except Exception:
+                pass
     return result
 
 
@@ -165,7 +170,7 @@ async def api_scan_stream(request: Request, start: str = Query(...), end: str = 
             scanned += 1
             # persist each result
             try:
-                await db.save(result["date"], result.get("available", False), result.get("room_count", 0))
+                await db.save(result["date"], result.get("available", False), result.get("room_count", 0), result.get("rooms"))
             except Exception:
                 pass  # non-critical
             payload = {"scanned": scanned, "total": total, **result}
@@ -195,7 +200,7 @@ async def api_cron_scan():
     try:
         results = await scraper.scan(start, end)
         for r in results:
-            await db.save(r["date"], r.get("available", False), r.get("room_count", 0))
+            await db.save(r["date"], r.get("available", False), r.get("room_count", 0), r.get("rooms"))
         return {
             "status": "ok",
             "scanned": len(results),

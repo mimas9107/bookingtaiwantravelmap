@@ -114,6 +114,12 @@ header p { font-size: 0.85rem; opacity: .85; margin-top: .25rem; }
 .day-cell.available .badge { color: var(--green); }
 .day-cell.soldout .badge { color: var(--red); }
 .day-cell.selected { box-shadow: 0 0 0 3px #3b82f6 !important; }
+.day-cell.changed::after {
+  content: ''; position: absolute; top: 4px; right: 4px;
+  width: 8px; height: 8px; background: #8b5cf6; border-radius: 50%;
+}
+.day-cell.changed.available { background: #f0fdf4; }
+.day-cell.changed.soldout { background: #fef2f2; }
 
 .legend { display: flex; gap: 1rem; justify-content: center; padding: .5rem 1rem 1rem; font-size: .8rem; }
 .legend span { display: flex; align-items: center; gap: .3rem; }
@@ -139,6 +145,12 @@ header p { font-size: 0.85rem; opacity: .85; margin-top: .25rem; }
 .room-row .rstatus { font-size: .8rem; font-weight: 600; }
 .room-row .rstatus.avail { color: var(--green); }
 .room-row .rstatus.sold { color: var(--red); }
+.change-tag {
+  font-size: .7rem; padding: 2px 6px; border-radius: 4px; font-weight: 600;
+  margin-left: .5rem; white-space: nowrap;
+}
+.change-tag.freed { background: #dbeafe; color: #1d4ed8; }
+.change-tag.taken { background: #fef2f2; color: #dc2626; }
 
 .db-tools {
   display: flex; align-items: center; gap: .5rem; flex-wrap: wrap;

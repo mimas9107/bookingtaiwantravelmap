@@ -2,13 +2,33 @@
 name:          "CHANGELOG.md"
 description:   "合歡山松雪樓空房查詢工具 — 版本變更紀錄"
 created_date:  "2026/06/15 16:30:00"
-modified_date: "2026/06/16 11:30:00"
-project_version: "2.1.4"
-document_version: "2.0.4"
+modified_date: "2026/06/16 12:00:00"
+project_version: "2.2.0"
+document_version: "2.1.0"
 agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free']
 ---
 
 # 版本變更紀錄
+
+## v2.2.0 (2026-06-16)
+
+### ✨ 新增 — 房況變動偵測（diff）
+- 每次掃描時自動比對前次資料，標記有變動的房型（釋出 / 被訂走）
+- DB schema 新增 `rooms_json` + `changes_json` 欄位
+- `scraper.scan()` / `scan_stream()` 改用 `_parse_rooms()` 回傳各房型明細
+- `_save()` 自動計算 diff：讀取前次 rooms → 比對 → 寫入 changes
+- `Database._get_all()` 自動解析 JSON 欄位，前端可直接取用
+- `tests/test_diff.py` — `compute_room_changes()` 8 項單元測試
+
+### 🎨 前端 — 變動視覺化
+- 日曆格子：有變動的日期右上角顯示紫色圓點（CSS `::after`）
+- 房型詳情 panel：變動房型顯示「⬇ 釋出」「⬆ 被訂走」標籤
+
+### 🤖 Bot — 變動提示
+- Telegram 查詢結果中，有變動的日期後方顯示 `🔄`
+- 單日房型詳情顯示「⬇釋出／⬆被訂」註記
+
+---
 
 ## v2.1.4 (2026-06-16)
 
