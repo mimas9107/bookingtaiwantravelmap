@@ -285,6 +285,8 @@ async function loadCache() {
     const startD = new Date(keys[0]);
     state.currentYear = startD.getFullYear();
     state.currentMonth = startD.getMonth();
+    startInp.value = keys[0];
+    endInp.value = keys[keys.length - 1];
   } else {
     const t = today();
     state.currentYear = t.getFullYear();
