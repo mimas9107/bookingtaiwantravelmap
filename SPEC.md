@@ -3,7 +3,7 @@ name:          "SPEC.md"
 description:   "合歡山松雪樓訂房查詢工具 — 專案規格書"
 created_date:  "2026/06/15 16:55:00"
 modified_date: "2026/06/16 10:00:00"
-project_version: "2.0.2"
+project_version: "2.1.0"
 document_version: "1.1.0"
 agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free']
 ---
@@ -115,6 +115,16 @@ SSE 串流。事件：
 
 ### `GET /api/db/export`
 下載 SQLite 資料庫。回傳 `application/octet-stream`，檔名 `songxuelou_scans_YYYYMMDD.db`。
+
+### `POST /bot/telegram`
+Telegram Bot webhook（需設定 `TELEGRAM_TOKEN` + `PUBLIC_URL`）。接收 Telegram Update JSON，背景執行查詢並發送回覆。支援指令：
+
+| 指令 | 動作 | 範例 |
+|------|------|------|
+| `查 <M/D>` | 單日房型明細 | `查 7/1` |
+| `查 <M/D>~<M/D>` | 範圍掃描 + 存 DB | `查 7/1~7/5` |
+| `快取` / `最近` | 讀取 SQLite 快取 | `最近` |
+| `help` / `說明` | 顯示指令列表 | `/help` |
 
 ### `POST /api/db/import`
 上傳 `.db` 檔案取代目前資料庫。需滿足：

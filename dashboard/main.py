@@ -8,9 +8,11 @@ from fastapi.responses import HTMLResponse, StreamingResponse, FileResponse, Res
 from fastapi.staticfiles import StaticFiles
 from scraper import BookingScraper
 from database import Database, DB_PATH
+from bot import telegram as bot
 
 scraper: BookingScraper | None = None
 db: Database | None = None
+BOT_ENABLED = bool(os.environ.get("TELEGRAM_TOKEN"))
 
 
 @asynccontextmanager
@@ -19,7 +21,14 @@ async def lifespan(app: FastAPI):
     scraper = BookingScraper()
     db = Database()
     await db.init()
+    if BOT_ENABLED:
+        public_url = os.environ.get("PUBLIC_URL", "")
+        if public_url:
+            ok = await bot.set_webhook(public_url)
+            print(f"Telegram webhook set: {ok}")
     yield
+    if BOT_ENABLED:
+        await bot.delete_webhook()
     await scraper.close()
 
 
@@ -178,6 +187,17 @@ async def api_db_import(file: UploadFile = File(...)):
         return {"status": "ok", "rows": count, "message": f"已匯入 {count} 筆資料"}
     except ValueError as e:
         raise HTTPException(400, str(e))
+
+
+# ── Telegram Bot Webhook ──
+
+@app.post("/bot/telegram")
+async def bot_webhook(request: Request):
+    if not BOT_ENABLED:
+        raise HTTPException(501, "Telegram bot 未啟用 (需設定 TELEGRAM_TOKEN)")
+    body = await request.json()
+    asyncio.create_task(bot.handle_update(body, scraper, db))
+    return {"ok": True}
 
 
 if __name__ == "__main__":

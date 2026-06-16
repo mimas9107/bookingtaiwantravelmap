@@ -3,7 +3,7 @@ name:          "README.md"
 description:   "合歡山松雪樓訂房查詢工具 — 使用說明"
 created_date:  "2026/06/15 14:01:53"
 modified_date: "2026/06/16 10:00:00"
-project_version: "2.0.2"
+project_version: "2.1.0"
 document_version: "2.0.2"
 agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free']
 ---
@@ -90,6 +90,7 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 | **快取載入** | 頁面載入時自動讀取 SQLite 快取，顯示「上次查詢: xxx」 |
 | **房型明細** | 點日期查看該日各房型可訂狀態 |
 | **排程更新** | `/api/cron/scan` 可供 cron-job.org 定時觸發，自動掃描 30 天 |
+| **Telegram Bot** | webhook 整合，支援 `查 7/1`、`查 7/1~7/5`、`最近狀況` 等自然語言指令 |
 | **Keepalive** | `/api/ping` 避免 Render free tier 15 分鐘 spin down |
 
 ### 快取行為

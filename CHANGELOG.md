@@ -3,12 +3,23 @@ name:          "CHANGELOG.md"
 description:   "合歡山松雪樓訂房工具 — 版本變更紀錄"
 created_date:  "2026/06/15 16:30:00"
 modified_date: "2026/06/16 10:00:00"
-project_version: "2.0.2"
+project_version: "2.1.0"
 document_version: "2.0.2"
 agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free']
 ---
 
 # 版本變更紀錄
+
+## v2.1.0 (2026-06-16)
+
+### 🚀 新增 — Telegram Bot 整合
+- `dashboard/bot/` 模組：intent 解析 / formatter 排版 / telegram API 封裝
+- `POST /bot/telegram` — Telegram webhook 端點（背景處理，即時回應）
+- intent 支援：單日查詢 `查 7/1`、範圍掃描 `查 7/1~7/5`、快取讀取、help
+- 啟動時自動向 Telegram 註冊 webhook（需設定 `TELEGRAM_TOKEN` + `PUBLIC_URL`）
+- `.env.example` 新增 Telegram Bot 設定區段
+
+---
 
 ## v2.0.2 (2026-06-16)
 
