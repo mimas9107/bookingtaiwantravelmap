@@ -1,11 +1,13 @@
 import os
 import json
 import time
-from datetime import datetime, timedelta
+import asyncio
+from datetime import datetime, timedelta, timezone
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Query, HTTPException, Request, UploadFile, File
 from fastapi.responses import HTMLResponse, StreamingResponse, FileResponse, Response
 from fastapi.staticfiles import StaticFiles
+from httpx import AsyncClient
 from scraper import BookingScraper
 from database import Database, DB_PATH
 from bot import telegram as bot
@@ -13,20 +15,36 @@ from bot import telegram as bot
 scraper: BookingScraper | None = None
 db: Database | None = None
 BOT_ENABLED = bool(os.environ.get("TELEGRAM_TOKEN"))
+_heartbeat_task: asyncio.Task | None = None
+
+
+async def _heartbeat_loop(port: int):
+    url = f"http://127.0.0.1:{port}/api/ping"
+    async with AsyncClient() as c:
+        while True:
+            await asyncio.sleep(120)
+            try:
+                await c.get(url, timeout=5.0)
+            except Exception:
+                pass
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global scraper, db
+    global scraper, db, _heartbeat_task
     scraper = BookingScraper()
     db = Database()
     await db.init()
+    port = int(os.environ.get("PORT", "8000"))
+    _heartbeat_task = asyncio.create_task(_heartbeat_loop(port))
     if BOT_ENABLED:
         public_url = os.environ.get("PUBLIC_URL", "")
         if public_url:
             ok = await bot.set_webhook(public_url)
             print(f"Telegram webhook set: {ok}")
     yield
+    if _heartbeat_task:
+        _heartbeat_task.cancel()
     if BOT_ENABLED:
         await bot.delete_webhook()
     await scraper.close()
@@ -47,8 +65,14 @@ async def root():
 # ── keepalive （避免 Render free tier spin down） ──
 
 @app.get("/api/ping")
-async def api_ping():
-    return {"status": "ok"}
+async def api_ping(request: Request):
+    forwarded = request.headers.get("X-Forwarded-For", "")
+    client_ip = forwarded.split(",")[0].strip() if forwarded else request.client.host
+    return {
+        "status": "ok",
+        "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "client_ip": client_ip,
+    }
 
 
 # ── 快取讀取 ──

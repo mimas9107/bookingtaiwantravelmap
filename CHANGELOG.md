@@ -3,12 +3,21 @@ name:          "CHANGELOG.md"
 description:   "合歡山松雪樓訂房工具 — 版本變更紀錄"
 created_date:  "2026/06/15 16:30:00"
 modified_date: "2026/06/16 10:00:00"
-project_version: "2.1.0"
+project_version: "2.1.1"
 document_version: "2.0.2"
 agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free']
 ---
 
 # 版本變更紀錄
+
+## v2.1.1 (2026-06-16)
+
+### 🔧 強化 — ping 端點與自動心跳
+- `/api/ping` 回傳擴充：`timestamp`（UTC ISO8601）+ `client_ip`（支援 `X-Forwarded-For` proxy 環境）
+- 新增背景心跳任務（120 秒間隔），自動戳自身 `/api/ping`，避免 Render 閒置判定
+- 心跳任務在 lifespan shutdown 時正確取消
+
+---
 
 ## v2.1.0 (2026-06-16)
 

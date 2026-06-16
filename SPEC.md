@@ -3,7 +3,7 @@ name:          "SPEC.md"
 description:   "合歡山松雪樓訂房查詢工具 — 專案規格書"
 created_date:  "2026/06/15 16:55:00"
 modified_date: "2026/06/16 10:00:00"
-project_version: "2.1.0"
+project_version: "2.1.1"
 document_version: "1.1.0"
 agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free']
 ---
