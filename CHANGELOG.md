@@ -2,13 +2,22 @@
 name:          "CHANGELOG.md"
 description:   "合歡山松雪樓空房查詢工具 — 版本變更紀錄"
 created_date:  "2026/06/15 16:30:00"
-modified_date: "2026/06/16 12:00:00"
-project_version: "2.2.0"
-document_version: "2.1.0"
+modified_date: "2026/06/16 12:30:00"
+project_version: "2.2.1"
+document_version: "2.1.1"
 agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free']
 ---
 
 # 版本變更紀錄
+
+## v2.2.1 (2026-06-16)
+
+### 🛠 工具 — db_tool.py 新增 csv 子命令
+- `csv` 子命令：呼叫 `/api/latest`，輸出 CSV 至 stdout 或 `-o FILE`
+- 欄位：`date`, `available`, `room_count`, `rooms`(JSON), `changes`(JSON), `scanned_at`
+- `rooms` 與 `changes` 以 JSON 字串嵌入 CSV，保留完整結構資訊
+
+---
 
 ## v2.2.0 (2026-06-16)
 

@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 """
-松雪樓儀表板 — 資料庫下載／上傳工具
+松雪樓儀表板 — 資料庫工具
 
 Usage:
   ./scripts/db_tool.py download [--host URL] [-o FILE]
   ./scripts/db_tool.py upload <file> [--host URL]
   ./scripts/db_tool.py info [--host URL]
+  ./scripts/db_tool.py csv [--host URL] [-o FILE]
 
 Examples:
   ./scripts/db_tool.py download
-  ./scripts/db_tool.py download -o backup.db
-  ./scripts/db_tool.py download --host http://localhost:8000
-  ./scripts/db_tool.py upload ~/backup.db
+  ./scripts/db_tool.py csv > report.csv
+  ./scripts/db_tool.py csv -o report.csv
+  ./scripts/db_tool.py csv --host http://localhost:8000
   ./scripts/db_tool.py info
 """
-import sys, os, argparse
+import sys, os, argparse, csv, json
 from urllib.request import urlopen, Request
 from urllib.error import HTTPError, URLError
 from datetime import datetime
@@ -113,8 +114,48 @@ def cmd_info(host: str):
     print(f"   可訂天數: {meta['available_days']}")
 
 
+def cmd_csv(host: str, output: str | None):
+    """Fetch /api/latest and write CSV to file or stdout."""
+    api = f"{host.rstrip('/')}/api/latest"
+    try:
+        with urlopen(_req("GET", api)) as resp:
+            payload = json.loads(resp.read())
+    except HTTPError as e:
+        msg = e.read().decode(errors="replace")
+        print(f"❌ 查詢失敗 ({e.code}): {msg}", file=sys.stderr)
+        sys.exit(1)
+    except URLError as e:
+        print(f"❌ 無法連線至 {host}: {e.reason}", file=sys.stderr)
+        sys.exit(1)
+
+    rows = payload.get("data", [])
+    if not rows:
+        print("ℹ️  資料庫為空", file=sys.stderr)
+        return
+
+    fout = open(output, "w", newline="", encoding="utf-8-sig") if output else sys.stdout
+    try:
+        writer = csv.writer(fout)
+        writer.writerow(["date", "available", "room_count", "rooms", "changes", "scanned_at"])
+        for r in rows:
+            rooms_json = json.dumps(r.get("rooms", []), ensure_ascii=False)
+            changes_json = json.dumps(r.get("changes"), ensure_ascii=False) if r.get("changes") else ""
+            writer.writerow([
+                r["date"],
+                "Y" if r.get("available") else "N",
+                r.get("room_count", 0),
+                rooms_json,
+                changes_json,
+                r.get("scanned_at", ""),
+            ])
+    finally:
+        if output:
+            fout.close()
+            print(f"✅ 已寫入 {len(rows)} 行 → {output}")
+
+
 def main():
-    p = argparse.ArgumentParser(description="松雪樓儀表板 — 資料庫下載／上傳工具")
+    p = argparse.ArgumentParser(description="松雪樓儀表板 — 資料庫工具")
     p.add_argument("--host", default="http://localhost:8000",
                    help="儀表板網址 (default: http://localhost:8000)")
     sub = p.add_subparsers(dest="command", required=True)
@@ -127,6 +168,9 @@ def main():
 
     sub.add_parser("info", help="顯示資料庫摘要")
 
+    c = sub.add_parser("csv", help="匯出 CSV")
+    c.add_argument("-o", "--output", help="寫入檔案 (default: stdout)")
+
     args = p.parse_args()
 
     match args.command:
@@ -136,6 +180,8 @@ def main():
             cmd_upload(args.host, args.file)
         case "info":
             cmd_info(args.host)
+        case "csv":
+            cmd_csv(args.host, args.output)
 
 
 if __name__ == "__main__":
