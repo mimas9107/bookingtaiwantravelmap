@@ -5,7 +5,7 @@ import asyncio
 import logging
 from datetime import datetime, timedelta, timezone
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Query, HTTPException, Request, UploadFile, File
+from fastapi import FastAPI, Query, HTTPException, Request, UploadFile, File, BackgroundTasks
 from fastapi.responses import HTMLResponse, StreamingResponse, FileResponse, Response
 from fastapi.staticfiles import StaticFiles
 from httpx import AsyncClient

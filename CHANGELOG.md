@@ -3,12 +3,17 @@ name:          "CHANGELOG.md"
 description:   "合歡山松雪樓空房查詢工具 — 版本變更紀錄"
 created_date:  "2026/06/15 16:30:00"
 modified_date: "2026/06/16 12:30:00"
-project_version: "2.2.2"
-document_version: "2.1.2"
+project_version: "2.2.3"
+document_version: "2.1.3"
 agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free','gemini cli/current_agent']
 ---
 
 # 版本變更紀錄
+
+## v2.2.3 (2026-06-16)
+
+### 🐛 修復 — /api/cron/scan 422 錯誤
+- 修正 `dashboard/main.py` 缺少 `BackgroundTasks` 匯入導致的參數驗證失敗
 
 ## v2.2.2 (2026-06-16)
 
