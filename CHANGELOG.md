@@ -1,6 +1,6 @@
 ---
 name:          "CHANGELOG.md"
-description:   "合歡山松雪樓訂房工具 — 版本變更紀錄"
+description:   "合歡山松雪樓空房查詢工具 — 版本變更紀錄"
 created_date:  "2026/06/15 16:30:00"
 modified_date: "2026/06/16 11:30:00"
 project_version: "2.1.4"

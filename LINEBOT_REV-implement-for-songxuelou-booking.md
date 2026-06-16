@@ -1,6 +1,6 @@
 ---
 name:          "LINEBOT_REV-implement-for-songxuelou-booking.md"
-description:   "合歡山松雪樓訂房查詢 — LINEBOT_REV 整合開發文件"
+description:   "合歡山松雪樓空房查詢 — LINEBOT_REV 整合開發文件"
 created_date:  "2026/06/16 11:40:00"
 modified_date: "2026/06/16 11:40:00"
 project_version: "2.1.4"
@@ -8,7 +8,7 @@ document_version: "1.0.0"
 agent_sign: ['opencode/deepseek-v4-flash-free']
 ---
 
-# LINEBOT_REV × 松雪樓訂房查詢 整合開發文件
+# LINEBOT_REV × 松雪樓空房查詢 整合開發文件
 
 ## 1. 概述
 

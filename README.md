@@ -1,6 +1,6 @@
 ---
 name:          "README.md"
-description:   "合歡山松雪樓訂房查詢工具 — 使用說明"
+description:   "合歡山松雪樓空房查詢工具 — 使用說明"
 created_date:  "2026/06/15 14:01:53"
 modified_date: "2026/06/16 11:30:00"
 project_version: "2.1.4"
@@ -8,7 +8,7 @@ document_version: "2.0.4"
 agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free']
 ---
 
-# 合歡山松雪樓 訂房查詢工具
+# 合歡山松雪樓 空房查詢工具
 
 自動化查詢合歡山松雪樓（booking.taiwantravelmap.com）的空房狀況。
 
@@ -20,14 +20,14 @@ agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free
 ├── CHANGELOG.md               # 版本變更紀錄
 ├── SPEC.md                    # 專案規格書
 ├── MEMOIR.md                  # 架構決策紀錄
-├── RULES.md                   # 訂房日期規則與政策
+├── RULES.md                   # 入住日期規則摘要
 ├── CONFIRM_FIELDS.md          # confirm.aspx 欄位參考
-├── PIPELINE.md                # 訂房管線分析
+├── PIPELINE.md                # 官網操作流程分析
 ├── .env                       # 個人資料設定檔（需自行建立）
 ├── .env.example               # 設定檔範本
 ├── .gitignore                 # 避免 .env + data/ 被提交
 │
-│ ├── scripts/                   # 訂房輔助腳本
+│ ├── scripts/                   # 查詢與預填腳本
 │   ├── check_availability.py  # 批次檢查日期範圍空房（主要）
 │   ├── search_booking.py      # 快速查詢特定入住日（主要）
 │   ├── auto_order_url.py      # Step 1→2 自動化（主要）
