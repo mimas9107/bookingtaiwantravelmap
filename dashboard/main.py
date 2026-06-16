@@ -120,6 +120,29 @@ async def api_latest_meta():
     }}
 
 
+# ── 單日空房查詢（供 bot / agent 使用） ──
+
+@app.get("/api/query")
+async def api_query(date: str = Query(...), rooms: int = Query(0)):
+    data = await db.get_all()
+    day = next((r for r in data if r["date"] == date), None)
+    result = {
+        "date": date,
+        "in_cache": day is not None,
+    }
+    if day:
+        result["available"] = day["available"]
+        result["room_count"] = day["room_count"]
+        result["scanned_at"] = day["scanned_at"]
+    if rooms and day and day["available"]:
+        try:
+            detail = await scraper.rooms(date)
+            result["rooms"] = detail.get("rooms", [])
+        except Exception:
+            pass
+    return result
+
+
 # ── 即時查詢（SSE 串流 + 自動存 DB） ──
 
 @app.get("/api/scan-stream")

@@ -2,13 +2,22 @@
 name:          "CHANGELOG.md"
 description:   "合歡山松雪樓訂房工具 — 版本變更紀錄"
 created_date:  "2026/06/15 16:30:00"
-modified_date: "2026/06/16 11:10:00"
-project_version: "2.1.3"
-document_version: "2.0.3"
+modified_date: "2026/06/16 11:30:00"
+project_version: "2.1.4"
+document_version: "2.0.4"
 agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free']
 ---
 
 # 版本變更紀錄
+
+## v2.1.4 (2026-06-16)
+
+### ✨ 新增 — `/api/query` 單日空房查詢端點
+- `GET /api/query?date=2026-06-20`：從快取回傳單日空房摘要（`available`, `room_count`, `scanned_at`）
+- `GET /api/query?date=2026-06-20&rooms=1`：若該日有空房，額外回傳各房型明細
+- 專為 bot / AI agent 設計的輕量端點，避免解析整份快取列表
+
+---
 
 ## v2.1.3 (2026-06-16)
 
