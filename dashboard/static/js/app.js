@@ -455,8 +455,7 @@ function validateProfile(d) {
 }
 
 function buildBookmarkletCode(d) {
-  // compact: use short keys matching localStorage format
-  const payload = JSON.stringify({
+  const data = JSON.stringify({
     ln: d.ln, fn: d.fn, sx: d.sx || '0',
     by: d.by, bm: d.bm, bd: d.bd,
     it: d.it || '0', id: d.id,
@@ -464,8 +463,8 @@ function buildBookmarkletCode(d) {
     ad: d.ad || '', pw: d.pw,
     nt: d.nt || '', ci: d.ci || '15:00',
   });
-  const code = `javascript:(function(){if(location.hostname!=='booking.taiwantravelmap.com'||location.pathname!=='/user/confirm.aspx')return alert('請在訂房確認頁面使用此書籤');var d=JSON.parse(localStorage.getItem('${LS_KEY}'));if(!d)return alert('請先在儀表板設定個人資料');var g=function(i){return document.getElementById(i)};if(!g('txt_LastName'))return alert('找不到訂房表單，請確認頁面已正確載入');g('txt_LastName').value=d.ln;g('txt_FirstName').value=d.fn;g('rb_sex1_'+(d.sx||'0')).checked=1;g('ddl_year1').value=d.by;g('ddl_month1').value=d.bm;g('ddl_day1').value=d.bd;g('rb_14_'+(d.it||'0')).checked=1;g('txt_Id').value=d.id;g('ddl_Country').value=d.ct||'TW';g('txt_Mail').value=d.em;g('txt_tel_1').value=d.ph;g('txt_MFC05').value=d.ad||'';g('txt_MF25').value=d.pw;g('txt_cpw').value=d.pw;g('txt_Note').value=d.nt||'';g('ddlCheckInHour').value=d.ci||'15:00';g('txt_check').focus();var c=g('chk_Order');if(c)c.checked=1;})()`;
-  return { code, payload };
+  const code = `javascript:(function(){if(location.hostname!=='booking.taiwantravelmap.com'||location.pathname!='/user/confirm.aspx')return alert('請在訂房確認頁面使用此書籤');var d=${data};var g=function(i){return document.getElementById(i)};if(!g('txt_LastName'))return alert('找不到訂房表單，請確認頁面已正確載入');g('txt_LastName').value=d.ln;g('txt_FirstName').value=d.fn;g('rb_sex1_'+(d.sx||'0')).checked=1;g('ddl_year1').value=d.by;g('ddl_month1').value=d.bm;g('ddl_day1').value=d.bd;g('rb_14_'+(d.it||'0')).checked=1;g('txt_Id').value=d.id;g('ddl_Country').value=d.ct||'TW';g('txt_Mail').value=d.em;g('txt_tel_1').value=d.ph;g('txt_MFC05').value=d.ad||'';g('txt_MF25').value=d.pw;g('txt_cpw').value=d.pw;g('txt_Note').value=d.nt||'';g('ddlCheckInHour').value=d.ci||'15:00';g('txt_check').focus();var c=g('chk_Order');if(c)c.checked=1;})()`;
+  return { code, data };
 }
 
 function updateBookmarklet() {
