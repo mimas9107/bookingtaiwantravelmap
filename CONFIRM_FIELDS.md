@@ -81,6 +81,46 @@ agent_sign: ['human/name','opencode/big-pickle']
 
 ---
 
+## 🚀 一鍵預填 — 瀏覽器書籤（Bookmarklet）
+
+> ✅ 新方案（v2.3.0+）：個資存在瀏覽器 `localStorage`，**不再嵌入書籤 URL**，安全無虞。
+
+### 使用步驟
+
+1. 開啟 [松雪樓空房查詢儀表板](https://your-app.onrender.com)
+2. 捲到下方「**設定訂房資料**」面板，填寫姓名、證件號碼、Email、手機、查詢密碼等必填欄位
+3. 按「**儲存**」→ 自動產生一組 `📋 松雪樓快速訂房` 書籤連結
+4. 將該連結**拖曳到瀏覽器書籤列**（或複製代碼手動新增書籤，網址欄貼上）
+5. 在 `confirm.aspx` 訂房頁點一下書籤 → 自動填入全部欄位 + 停在驗證碼
+
+### 安全防護
+
+| 層級 | 檢查項目 |
+|------|---------|
+| ① | `location.hostname === 'booking.taiwantravelmap.com'` |
+| ② | `location.pathname === '/user/confirm.aspx'` |
+| ③ | `document.getElementById('txt_LastName')` 存在才執行 |
+
+三者任一不符合則不執行任何操作。
+
+### 填入欄位一覽
+
+| DOM id | 對應資料 |
+|--------|---------|
+| `txt_LastName` / `txt_FirstName` | 姓 / 名 |
+| `rb_sex1` (0=男/1=女) | 性別 |
+| `ddl_year1` / `ddl_month1` / `ddl_day1` | 生日 |
+| `rb_14` (0=身分證/1=護照) | 證件類別 |
+| `txt_Id` | 證件號碼 |
+| `ddl_Country` | 國籍（固定 TW） |
+| `txt_Mail` | Email |
+| `txt_tel_1` | 手機 |
+| `txt_MFC05` | 地址 |
+| `txt_MF25` / `txt_cpw` | 查詢密碼 + 確認 |
+| `txt_Note` | 備註 |
+| `ddlCheckInHour` | 入住時間 |
+| `chk_Order` | 自動勾選同意條款（在 lightbox 內） |
+
 ## 🚀 一鍵預填（Playwright 自動化腳本）
 
 使用 `scripts/prefill_booking.py`：
@@ -93,7 +133,5 @@ vim .env
 
 腳本會自動操作瀏覽器完成 Step 1～Step 4 的填入，停在驗證碼前。
 
-> ⚠️ 不再使用 bookmarklet 方式（需將個資嵌入書籤 URL 不安全）
->
 > **自動處理**：腳本會幫你勾選同意條款（`chk_Order`）、關閉所有 lightbox、恢復頁面滾動。
 > 你只需要：輸入驗證碼 → 送出。
