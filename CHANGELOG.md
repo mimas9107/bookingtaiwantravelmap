@@ -2,13 +2,22 @@
 name:          "CHANGELOG.md"
 description:   "合歡山松雪樓空房查詢工具 — 版本變更紀錄"
 created_date:  "2026/06/15 16:30:00"
-modified_date: "2026/06/16 12:30:00"
-project_version: "2.2.3"
+modified_date: "2026/06/22 03:55:00"
+project_version: "2.2.4"
 document_version: "2.1.3"
 agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free','gemini cli/current_agent']
 ---
 
 # 版本變更紀錄
+
+## v2.2.4 (2026-06-22)
+
+### ✨ 新增 — 可訂房型一鍵連結至訂房頁
+- `scraper.py`: `order_url()` 新增 `verbose` 參數，支援無聲 API 呼叫
+- `main.py`: 新增 `GET /api/booking-url?date=...&room_name=...`，複用既有 `order_url()` 邏輯
+- `app.js`: 點擊有空的日期後，自動為每間可訂房型抓取訂房網址，房名改為 `<a>` 可點連結
+- `style.css`: 新增 `.rname-link`（藍色底線）樣式
+- 點擊房名在新分頁開啟 `confirm.aspx`，直接進入該房型訂單填寫頁
 
 ## v2.2.3 (2026-06-16)
 
