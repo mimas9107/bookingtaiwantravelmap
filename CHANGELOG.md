@@ -2,15 +2,23 @@
 name:          "CHANGELOG.md"
 description:   "合歡山松雪樓空房查詢工具 — 版本變更紀錄"
 created_date:  "2026/06/15 16:30:00"
-modified_date: "2026/06/22 04:15:00"
-project_version: "2.2.5"
-document_version: "2.1.3"
+modified_date: "2026/06/22 05:15:00"
+project_version: "2.3.0"
+document_version: "2.2.0"
 agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free','gemini cli/current_agent']
 ---
 
 # 版本變更紀錄
 
-## v2.2.5 (2026-06-22)
+## v2.3.0 (2026-06-22)
+
+### ✨ 新增 — 瀏覽器書籤自動填入訂房表單
+
+- `index.html` / `style.css` / `app.js`: 新增「設定訂房資料」面板，使用者在 dashboard 填寫一次個資後自動存入 `localStorage`
+- 產出 `javascript:` 書籤 （bookmarklet），在 `confirm.aspx` 點一下即可填入所有欄位
+- 三層安全檢查：網域 + 路徑 + 表單元素存在才執行填入
+- 停在驗證碼欄位，由使用者手動輸入 + 點擊送出（不下 Auto Submit）
+- 自動勾選「我已同意訂購須知」checkbox（位於 lightbox 內）
 
 ### ⚡ 優化 — 掃描時預先抓取訂房網址（實驗 C）
 

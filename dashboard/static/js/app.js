@@ -358,6 +358,170 @@ dbFileInput.addEventListener('change', async () => {
   }
 });
 
+// ── 訂房資料設定 ──
+
+const LS_KEY = 'sxl';
+const profileToggle = $('profileToggle');
+const profileBody = $('profileBody');
+const pfArrow = document.querySelector('.profile-arrow');
+
+profileToggle.addEventListener('click', () => {
+  profileBody.classList.toggle('open');
+  pfArrow.classList.toggle('open');
+});
+
+function populateBirthSelects() {
+  const ySel = $('pf_birthYear');
+  for (let y = new Date().getFullYear(); y >= 1910; y--) {
+    const opt = document.createElement('option');
+    opt.value = String(y); opt.textContent = String(y);
+    ySel.appendChild(opt);
+  }
+  const mSel = $('pf_birthMonth');
+  for (let m = 1; m <= 12; m++) {
+    const opt = document.createElement('option');
+    const v = String(m).padStart(2, '0');
+    opt.value = v; opt.textContent = v;
+    mSel.appendChild(opt);
+  }
+  const dSel = $('pf_birthDay');
+  for (let d = 1; d <= 31; d++) {
+    const opt = document.createElement('option');
+    const v = String(d).padStart(2, '0');
+    opt.value = v; opt.textContent = v;
+    dSel.appendChild(opt);
+  }
+}
+populateBirthSelects();
+
+function loadProfile() {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch { return null; }
+}
+
+function applyProfileToForm(d) {
+  if (!d) return;
+  $('pf_lastName').value = d.ln || '';
+  $('pf_firstName').value = d.fn || '';
+  const sexRadio = document.querySelector('input[name="pf_sex"][value="' + (d.sx || '0') + '"]');
+  if (sexRadio) sexRadio.checked = true;
+  if (d.by) $('pf_birthYear').value = d.by;
+  if (d.bm) $('pf_birthMonth').value = d.bm;
+  if (d.bd) $('pf_birthDay').value = d.bd;
+  const idRadio = document.querySelector('input[name="pf_idType"][value="' + (d.it || '0') + '"]');
+  if (idRadio) idRadio.checked = true;
+  $('pf_idNumber').value = d.id || '';
+  $('pf_email').value = d.em || '';
+  $('pf_phone').value = d.ph || '';
+  $('pf_address').value = d.ad || '';
+  if (d.ci) $('pf_checkinTime').value = d.ci;
+  $('pf_password').value = d.pw || '';
+  $('pf_note').value = d.nt || '';
+}
+
+function readProfileFromForm() {
+  const sx = document.querySelector('input[name="pf_sex"]:checked');
+  const it = document.querySelector('input[name="pf_idType"]:checked');
+  return {
+    ln: $('pf_lastName').value.trim(),
+    fn: $('pf_firstName').value.trim(),
+    sx: sx ? sx.value : '0',
+    by: $('pf_birthYear').value,
+    bm: $('pf_birthMonth').value,
+    bd: $('pf_birthDay').value,
+    it: it ? it.value : '0',
+    id: $('pf_idNumber').value.trim(),
+    em: $('pf_email').value.trim(),
+    ph: $('pf_phone').value.trim(),
+    ad: $('pf_address').value.trim(),
+    ci: $('pf_checkinTime').value,
+    pw: $('pf_password').value,
+    nt: $('pf_note').value.trim(),
+  };
+}
+
+function validateProfile(d) {
+  const missing = [];
+  if (!d.ln) missing.push('姓');
+  if (!d.fn) missing.push('名');
+  if (!d.id) missing.push('證件號碼');
+  if (!d.em) missing.push('Email');
+  if (!d.ph) missing.push('手機');
+  if (!d.pw) missing.push('查詢密碼');
+  return missing;
+}
+
+function buildBookmarkletCode(d) {
+  // compact: use short keys matching localStorage format
+  const payload = JSON.stringify({
+    ln: d.ln, fn: d.fn, sx: d.sx || '0',
+    by: d.by, bm: d.bm, bd: d.bd,
+    it: d.it || '0', id: d.id,
+    ct: 'TW', em: d.em, ph: d.ph,
+    ad: d.ad || '', pw: d.pw,
+    nt: d.nt || '', ci: d.ci || '15:00',
+  });
+  const code = `javascript:(function(){if(location.hostname!=='booking.taiwantravelmap.com'||location.pathname!=='/user/confirm.aspx')return alert('請在訂房確認頁面使用此書籤');var d=JSON.parse(localStorage.getItem('${LS_KEY}'));if(!d)return alert('請先在儀表板設定個人資料');var g=function(i){return document.getElementById(i)};if(!g('txt_LastName'))return alert('找不到訂房表單，請確認頁面已正確載入');g('txt_LastName').value=d.ln;g('txt_FirstName').value=d.fn;g('rb_sex1_'+(d.sx||'0')).checked=1;g('ddl_year1').value=d.by;g('ddl_month1').value=d.bm;g('ddl_day1').value=d.bd;g('rb_14_'+(d.it||'0')).checked=1;g('txt_Id').value=d.id;g('ddl_Country').value=d.ct||'TW';g('txt_Mail').value=d.em;g('txt_tel_1').value=d.ph;g('txt_MFC05').value=d.ad||'';g('txt_MF25').value=d.pw;g('txt_cpw').value=d.pw;g('txt_Note').value=d.nt||'';g('ddlCheckInHour').value=d.ci||'15:00';g('txt_check').focus();var c=g('chk_Order');if(c)c.checked=1;})()`;
+  return { code, payload };
+}
+
+function updateBookmarklet() {
+  const area = $('pf_bookmarkletArea');
+  const link = $('pf_bookmarkletLink');
+  const codeEl = $('pf_bookmarkletCode');
+  const d = loadProfile();
+  if (!d || !d.ln) {
+    area.style.display = 'none';
+    return;
+  }
+  const { code } = buildBookmarkletCode(d);
+  link.href = code;
+  codeEl.value = code;
+  area.style.display = 'block';
+}
+
+$('pf_saveBtn').addEventListener('click', () => {
+  const d = readProfileFromForm();
+  const missing = validateProfile(d);
+  const status = $('pf_status');
+  if (missing.length > 0) {
+    status.textContent = '❌ 請填寫必填欄位：' + missing.join('、');
+    status.className = 'profile-status err';
+    return;
+  }
+  localStorage.setItem(LS_KEY, JSON.stringify(d));
+  status.textContent = '✅ 已儲存！';
+  status.className = 'profile-status';
+  updateBookmarklet();
+});
+
+$('pf_clearBtn').addEventListener('click', () => {
+  localStorage.removeItem(LS_KEY);
+  $('pf_lastName').value = ''; $('pf_firstName').value = '';
+  $('pf_idNumber').value = ''; $('pf_email').value = '';
+  $('pf_phone').value = ''; $('pf_address').value = '';
+  $('pf_password').value = ''; $('pf_note').value = '';
+  $('pf_checkinTime').value = '15:00';
+  $('pf_birthYear').value = ''; $('pf_birthMonth').value = ''; $('pf_birthDay').value = '';
+  document.querySelector('input[name="pf_sex"][value="0"]').checked = true;
+  document.querySelector('input[name="pf_idType"][value="0"]').checked = true;
+  $('pf_status').textContent = '🗑 已清除';
+  $('pf_status').className = 'profile-status';
+  $('pf_bookmarkletArea').style.display = 'none';
+});
+
+$('pf_showPw').addEventListener('change', function () {
+  $('pf_password').type = this.checked ? 'text' : 'password';
+});
+
+// load saved profile on page load
+const saved = loadProfile();
+if (saved) applyProfileToForm(saved);
+updateBookmarklet();
+
 initDates();
 prevBtn.addEventListener('click', () => navigateMonth(-1));
 nextBtn.addEventListener('click', () => navigateMonth(1));
