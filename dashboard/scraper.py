@@ -177,7 +177,7 @@ class BookingScraper:
     }
 
     async def order_url(self, checkin: str, checkout: str | None = None,
-                        room_id: int = 7735) -> str:
+                        room_id: int = 7735, verbose: bool = False) -> str:
         """Step 1→2: search → select room → return final order.aspx URL."""
         await self._warmup()
 
@@ -190,7 +190,8 @@ class BookingScraper:
                       f"&checkin={ci}&checkout={co}"
                       f"&count=1&people=2&unit=room&lg=ch")
 
-        print("Step 1: GET 搜尋頁...", end=" ", flush=True)
+        if verbose:
+            print("Step 1: GET 搜尋頁...", end=" ", flush=True)
         html = await self._request(search_url, referer=f"{BASE}/user/booking.aspx?m=1156")
 
         # parse room order from page to map room_id → ctl index
@@ -214,9 +215,11 @@ class BookingScraper:
         btn_name = f"RoomListView$ctl{target_idx:02d}$btGoOrderCalendar"
         if btn_name not in html:
             raise RuntimeError(f"房型 {room_id}（{room_names[target_idx]}）無空房或頁面異常")
-        print("✅")
+        if verbose:
+            print("✅")
 
-        print("Step 2: POST 選房型...", end=" ", flush=True)
+        if verbose:
+            print("Step 2: POST 選房型...", end=" ", flush=True)
         data = {
             "_TSM_HiddenField_": self._grep_field(html, "_TSM_HiddenField_"),
             "__VIEWSTATE": self._grep_field(html, "__VIEWSTATE"),
@@ -252,5 +255,6 @@ class BookingScraper:
         elif order_url.startswith("/"):
             order_url = f"{BASE}{order_url}"
 
-        print("✅")
+        if verbose:
+            print("✅")
         return order_url

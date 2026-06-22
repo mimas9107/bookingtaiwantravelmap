@@ -235,6 +235,25 @@ async def api_rooms(date: str = Query(...)):
         raise HTTPException(503, f"查詢失敗: {e}")
 
 
+# ── 訂房網址產生（複用 order_url 邏輯） ──
+
+@app.get("/api/booking-url")
+async def api_booking_url(date: str = Query(...), room_name: str = Query(None), room_id: int = Query(None)):
+    if room_id is None and room_name is None:
+        raise HTTPException(400, "請提供 room_name 或 room_id")
+    if room_id is None:
+        rid = scraper.NAME_TO_ID.get(room_name)
+        if rid is None:
+            raise HTTPException(400, f"未知房型: {room_name}，可用: {list(scraper.NAME_TO_ID.keys())}")
+    else:
+        rid = room_id
+    try:
+        url = await scraper.order_url(date, room_id=rid, verbose=False)
+        return {"url": url}
+    except Exception as e:
+        raise HTTPException(503, f"無法取得訂房網址: {e}")
+
+
 # ── 保留舊的 scan endpoint（相容） ──
 
 @app.get("/api/scan")

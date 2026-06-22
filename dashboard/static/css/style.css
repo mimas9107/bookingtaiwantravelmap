@@ -142,6 +142,11 @@ header p { font-size: 0.85rem; opacity: .85; margin-top: .25rem; }
 .room-row.avail { background: #f0fdf4; }
 .room-row.sold { background: #fef2f2; }
 .room-row .rname { font-weight: 500; }
+.room-row .rname-link {
+  font-weight: 500; color: #2563eb; text-decoration: underline;
+  text-underline-offset: 2px; transition: color .15s;
+}
+.room-row .rname-link:hover { color: #1d4ed8; }
 .room-row .rstatus { font-size: .8rem; font-weight: 600; }
 .room-row .rstatus.avail { color: var(--green); }
 .room-row .rstatus.sold { color: var(--red); }
