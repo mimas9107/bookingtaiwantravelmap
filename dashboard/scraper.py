@@ -87,7 +87,8 @@ class BookingScraper:
                         referer=f"{BASE}/user/booking.aspx?m=1156",
                     )
                     parsed = self._parse_rooms(html, ds)
-                    rooms = parsed.get("rooms", [])
+                    rooms = await self._enrich_rooms_with_urls(html, parsed.get("rooms", []), ds)
+                    parsed["rooms"] = rooms
                     parsed["room_count"] = sum(1 for r in rooms if r["available"])
                     return parsed
                 except Exception as e:
@@ -110,7 +111,8 @@ class BookingScraper:
                         referer=f"{BASE}/user/booking.aspx?m=1156",
                     )
                     parsed = self._parse_rooms(html, ds)
-                    rooms = parsed.get("rooms", [])
+                    rooms = await self._enrich_rooms_with_urls(html, parsed.get("rooms", []), ds)
+                    parsed["rooms"] = rooms
                     parsed["room_count"] = sum(1 for r in rooms if r["available"])
                     yield parsed
                 except asyncio.CancelledError:
@@ -124,7 +126,10 @@ class BookingScraper:
             self._search_url(ds),
             referer=f"{BASE}/user/booking.aspx?m=1156",
         )
-        return self._parse_rooms(html, ds)
+        parsed = self._parse_rooms(html, ds)
+        rooms = await self._enrich_rooms_with_urls(html, parsed.get("rooms", []), ds)
+        parsed["rooms"] = rooms
+        return parsed
 
     def _parse_rooms(self, html: str, ds: str) -> dict:
         soup = BeautifulSoup(html, "html.parser")
@@ -170,6 +175,62 @@ class BookingScraper:
         m = re.search(rf'{re.escape(name)}"\s+value="([^"]*)"', html)
         return m.group(1) if m else ""
 
+    async def _complete_order_url(self, html: str, target_idx: int, search_url: str) -> str:
+        """POST ASP.NET hidden fields → return order.aspx URL for room at target_idx."""
+        btn_name = f"RoomListView$ctl{target_idx:02d}$btGoOrderCalendar"
+        data = {
+            "_TSM_HiddenField_": self._grep_field(html, "_TSM_HiddenField_"),
+            "__VIEWSTATE": self._grep_field(html, "__VIEWSTATE"),
+            "__VIEWSTATEGENERATOR": self._grep_field(html, "__VIEWSTATEGENERATOR"),
+            "__VIEWSTATEENCRYPTED": self._grep_field(html, "__VIEWSTATEENCRYPTED"),
+            "__EVENTVALIDATION": self._grep_field(html, "__EVENTVALIDATION"),
+            "__EVENTTARGET": "", "__EVENTARGUMENT": "", "__LASTFOCUS": "",
+            "PageHeader$SourceURL": "?",
+            "PageHeader$hf_lg": "ch",
+            "PageHeader$hd_ticket_fixdays": "false",
+            "PageHeader$hd_ticket_staydays": "0",
+            "PageHeader$EndMessage": "?",
+            "PageHeader$OutsideEndMessage": "?",
+            "PageHeader$EndNextPage": "?",
+            "PageHeader$OutsideEndNextPage": "?",
+            btn_name: "一般訂房",
+        }
+        resp = await self._post(search_url, data, referer=search_url)
+        body = resp.text
+        order_url = str(resp.url)
+
+        if "order.aspx" not in order_url:
+            m = re.search(r'action="([^"]*order\.aspx[^"]*)"', body)
+            if m:
+                order_url = m.group(1)
+            else:
+                raise RuntimeError("無法取得 order.aspx URL")
+
+        if order_url.startswith("./"):
+            order_url = f"{BASE}/user/{order_url[2:]}"
+        elif order_url.startswith("/"):
+            order_url = f"{BASE}{order_url}"
+
+        return order_url
+
+    async def _enrich_rooms_with_urls(self, html: str, rooms: list, ds: str) -> list:
+        """Attach booking URL to each available room using the search page HTML."""
+        search_url = self._search_url(ds)
+        tasks = []
+        idxs = []
+        for i, r in enumerate(rooms):
+            if r["available"]:
+                tasks.append(self._complete_order_url(html, i, search_url))
+                idxs.append(i)
+        if not tasks:
+            return rooms
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        enriched = list(rooms)
+        for j, idx in enumerate(idxs):
+            if not isinstance(results[j], Exception):
+                enriched[idx] = {**rooms[idx], "url": results[j]}
+        return enriched
+
     NAME_TO_ID = {
         "松雪樓精緻兩人房": 7734,
         "松雪樓景觀兩人房": 7735,
@@ -212,49 +273,10 @@ class BookingScraper:
         if target_idx is None:
             raise RuntimeError(f"找不到房型 ID {room_id}（頁面顯示: {room_names}）")
 
-        btn_name = f"RoomListView$ctl{target_idx:02d}$btGoOrderCalendar"
-        if btn_name not in html:
-            raise RuntimeError(f"房型 {room_id}（{room_names[target_idx]}）無空房或頁面異常")
         if verbose:
             print("✅")
-
-        if verbose:
             print("Step 2: POST 選房型...", end=" ", flush=True)
-        data = {
-            "_TSM_HiddenField_": self._grep_field(html, "_TSM_HiddenField_"),
-            "__VIEWSTATE": self._grep_field(html, "__VIEWSTATE"),
-            "__VIEWSTATEGENERATOR": self._grep_field(html, "__VIEWSTATEGENERATOR"),
-            "__VIEWSTATEENCRYPTED": self._grep_field(html, "__VIEWSTATEENCRYPTED"),
-            "__EVENTVALIDATION": self._grep_field(html, "__EVENTVALIDATION"),
-            "__EVENTTARGET": "", "__EVENTARGUMENT": "", "__LASTFOCUS": "",
-            "PageHeader$SourceURL": "?",
-            "PageHeader$hf_lg": "ch",
-            "PageHeader$hd_ticket_fixdays": "false",
-            "PageHeader$hd_ticket_staydays": "0",
-            "PageHeader$EndMessage": "?",
-            "PageHeader$OutsideEndMessage": "?",
-            "PageHeader$EndNextPage": "?",
-            "PageHeader$OutsideEndNextPage": "?",
-            btn_name: "一般訂房",
-        }
-        resp = await self._post(search_url, data, referer=search_url)
-        body = resp.text
-        order_url = str(resp.url)
-
-        # httpx may not always reflect Server.Transfer redirect →
-        # fall back to form action
-        if "order.aspx" not in order_url:
-            m = re.search(r'action="([^"]*order\.aspx[^"]*)"', body)
-            if m:
-                order_url = m.group(1)
-            else:
-                raise RuntimeError("無法取得 order.aspx URL")
-
-        if order_url.startswith("./"):
-            order_url = f"{BASE}/user/{order_url[2:]}"
-        elif order_url.startswith("/"):
-            order_url = f"{BASE}{order_url}"
-
+        url = await self._complete_order_url(html, target_idx, search_url)
         if verbose:
             print("✅")
-        return order_url
+        return url

@@ -160,18 +160,6 @@ async function onDateClick(ds) {
     const availCount = info.rooms.filter(r => r.available).length;
     detailStatus.textContent = availCount > 0 ? `✅ ${availCount} 間可訂` : '❌ 已售完';
 
-    // fetch booking URLs for available rooms in parallel
-    const urlMap = {};
-    await Promise.all(info.rooms.filter(r => r.available).map(async r => {
-      try {
-        const resp = await fetch(`/api/booking-url?date=${ds}&room_name=${encodeURIComponent(r.name)}`);
-        if (resp.ok) {
-          const data = await resp.json();
-          urlMap[r.name] = data.url;
-        }
-      } catch (_) { /* non-critical */ }
-    }));
-
     const changes = state.data[ds]?.changes || [];
     const changeMap = {};
     changes.forEach(c => { changeMap[c.name] = c; });
@@ -184,8 +172,8 @@ async function onDateClick(ds) {
           ? `<span class="change-tag taken">⬆ 被訂走</span>`
           : `<span class="change-tag freed">⬇ 釋出</span>`;
       }
-      const nameHtml = urlMap[r.name]
-        ? `<a class="rname-link" href="${urlMap[r.name]}" target="_blank" rel="noopener">${r.name}</a>`
+      const nameHtml = r.url
+        ? `<a class="rname-link" href="${r.url}" target="_blank" rel="noopener">${r.name}</a>`
         : `<span class="rname">${r.name}</span>`;
       return `
       <div class="room-row ${r.available ? 'avail' : 'sold'}">

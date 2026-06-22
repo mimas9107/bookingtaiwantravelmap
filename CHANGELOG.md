@@ -2,13 +2,21 @@
 name:          "CHANGELOG.md"
 description:   "合歡山松雪樓空房查詢工具 — 版本變更紀錄"
 created_date:  "2026/06/15 16:30:00"
-modified_date: "2026/06/22 03:55:00"
-project_version: "2.2.4"
+modified_date: "2026/06/22 04:15:00"
+project_version: "2.2.5"
 document_version: "2.1.3"
 agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free','gemini cli/current_agent']
 ---
 
 # 版本變更紀錄
+
+## v2.2.5 (2026-06-22)
+
+### ⚡ 優化 — 掃描時預先抓取訂房網址（實驗 C）
+
+- `scraper.py`: 萃取 `_complete_order_url()` 從 `order_url()` 分離 POST 邏輯，新增 `_enrich_rooms_with_urls()` 在掃描中為可訂房型補上 `url` 欄位
+- `scan()` / `scan_stream()` / `rooms()` 三個入口皆會自動帶入訂房網址
+- `app.js`: 前端直接使用房間資料的 `r.url`，不再額外呼叫 `/api/booking-url`
 
 ## v2.2.4 (2026-06-22)
 

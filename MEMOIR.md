@@ -2,8 +2,8 @@
 name:          "MEMOIR.md"
 description:   "架構決策紀錄與經驗教訓"
 created_date:  "2026/06/15 16:55:00"
-modified_date: "2026/06/22 03:55:00"
-project_version: "2.2.4"
+modified_date: "2026/06/22 04:15:00"
+project_version: "2.2.5"
 document_version: "2.0.2"
 agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free','gemini cli/current_agent']
 ---
