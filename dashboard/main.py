@@ -17,6 +17,11 @@ from dashboard.bot import telegram as bot
 logger = logging.getLogger("uvicorn")
 
 def _get_git_commit() -> str:
+    # Prefer explicit commit hash from environment (e.g., CI/CD injection)
+    env_commit = os.getenv("COMMIT_HASH")
+    if env_commit:
+        return env_commit.strip()
+    # Fallback to git command when repository metadata is present
     try:
         commit = subprocess.check_output(
             ["git", "rev-parse", "--short=8", "HEAD"],
@@ -27,7 +32,28 @@ def _get_git_commit() -> str:
         commit = "unknown"
     return commit
 
-GIT_COMMIT = _get_git_commit()
+# Project version derived from CHANGELOG frontmatter (fallback to git commit if unavailable)
+def _get_project_version() -> str:
+    """Parse the front‑matter of CHANGELOG.md to extract `project_version`.
+    Returns the version string (e.g. "2.3.2") or falls back to git commit.
+    """
+    import pathlib, re
+    changelog_path = pathlib.Path(__file__).parent.parent / "CHANGELOG.md"
+    try:
+        text = changelog_path.read_text(encoding="utf-8")
+        # Front‑matter is between the first two '---' lines
+        parts = text.split('---')
+        if len(parts) >= 3:
+            yaml_block = parts[1]
+            match = re.search(r'project_version:\s*"?([^"]+)"?', yaml_block)
+            if match:
+                return match.group(1).strip()
+    except Exception:
+        pass
+    # Fallback to git commit (may be "unknown")
+    return _get_git_commit()
+
+GIT_COMMIT = _get_project_version()
 
 logger = logging.getLogger("uvicorn")
 

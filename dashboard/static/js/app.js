@@ -534,7 +534,7 @@ startInp.addEventListener('change', () => {
 });
 
 fetch('/api/version').then(r => r.json()).then(j => {
-  if (j.commit) $('commitHash').textContent = j.commit;
+  if (j.commit) $('projectVersion').textContent = j.commit;
 }).catch(() => {});
 
 loadCache();

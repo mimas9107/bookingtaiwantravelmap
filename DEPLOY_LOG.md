@@ -3,7 +3,7 @@ name:          "DEPLOY_LOG.md"
 description:   "合歡山松雪樓空房查詢工具 — 佈署問題紀錄"
 created_date:  "2026/06/16 12:45:00"
 modified_date: "2026/06/16 12:45:00"
-project_version: "2.2.1"
+project_version: "2.3.3"
 document_version: "1.0.0"
 agent_sign: ['opencode/deepseek-v4-flash-free']
 ---
