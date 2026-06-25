@@ -2,13 +2,22 @@
 name:          "CHANGELOG.md"
 description:   "合歡山松雪樓空房查詢工具 — 版本變更紀錄"
 created_date:  "2026/06/15 16:30:00"
-modified_date: "2026/06/22 05:15:00"
-project_version: "2.3.0"
-document_version: "2.2.0"
-agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free','gemini cli/current_agent']
+modified_date: "2026/06/25 18:00:00"
+project_version: "2.3.1"
+document_version: "2.2.1"
+agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free','gemini cli/current_agent','opencode/minimax-m2.5']
 ---
 
 # 版本變更紀錄
+
+## v2.3.1 (2026-06-25)
+
+### ✨ 新增 — 前端 Footer 顯示 Git Commit
+
+- `main.py`: 新增 `/api/version` 端點，啟動時取得 git commit 前 8 碼
+- `index.html`: 新增 `<footer>` 元素，顯示 commit hash
+- `app.js`: 頁面載入時 fetch `/api/version` 顯示於 footer
+- `style.css`: 新增 `footer` 樣式（灰色小字、居中、分隔線）
 
 ## v2.3.0 (2026-06-22)
 

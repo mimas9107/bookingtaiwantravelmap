@@ -2,10 +2,10 @@
 name:          "README.md"
 description:   "合歡山松雪樓空房查詢工具 — 使用說明"
 created_date:  "2026/06/15 14:01:53"
-modified_date: "2026/06/22 04:15:00"
-project_version: "2.3.0"
-document_version: "2.0.6"
-agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free','gemini cli/current_agent']
+modified_date: "2026/06/25 18:00:00"
+project_version: "2.3.1"
+document_version: "2.0.7"
+agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free','gemini cli/current_agent','opencode/minimax-m2.5']
 ---
 
 # 合歡山松雪樓 空房查詢工具

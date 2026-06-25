@@ -3,6 +3,7 @@ import json
 import time
 import asyncio
 import logging
+import subprocess
 from datetime import datetime, timedelta, timezone
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Query, HTTPException, Request, UploadFile, File, BackgroundTasks
@@ -12,6 +13,19 @@ from httpx import AsyncClient
 from dashboard.scraper import BookingScraper
 from dashboard.database import Database, DB_PATH
 from dashboard.bot import telegram as bot
+
+def _get_git_commit() -> str:
+    try:
+        commit = subprocess.check_output(
+            ["git", "rev-parse", "--short=8", "HEAD"],
+            stderr=subprocess.DEVNULL,
+            cwd=os.path.dirname(os.path.dirname(__file__))
+        ).decode().strip()
+    except Exception:
+        commit = "unknown"
+    return commit
+
+GIT_COMMIT = _get_git_commit()
 
 logger = logging.getLogger("uvicorn")
 
@@ -98,6 +112,11 @@ async def api_ping(request: Request):
         "timestamp": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "client_ip": client_ip,
     }
+
+
+@app.get("/api/version")
+async def api_version():
+    return {"commit": GIT_COMMIT}
 
 
 # ── 快取讀取 ──

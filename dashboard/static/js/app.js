@@ -531,4 +531,8 @@ startInp.addEventListener('change', () => {
   if (endInp.value < fmt(min)) endInp.value = fmt(min);
 });
 
+fetch('/api/version').then(r => r.json()).then(j => {
+  if (j.commit) $('commitHash').textContent = j.commit;
+}).catch(() => {});
+
 loadCache();
