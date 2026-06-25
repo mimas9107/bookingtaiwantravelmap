@@ -288,12 +288,14 @@ async function loadCache() {
     const startD = new Date(keys[0]);
     state.currentYear = startD.getFullYear();
     state.currentMonth = startD.getMonth();
-    startInp.value = keys[0];
-    endInp.value = keys[keys.length - 1];
+    startInp.value = fmt(addDays(today(), 1));
+    endInp.value = fmt(addDays(addDays(today(), 1), 7));
   } else {
     const t = today();
     state.currentYear = t.getFullYear();
     state.currentMonth = t.getMonth();
+    startInp.value = fmt(addDays(t, 1));
+    endInp.value = fmt(addDays(addDays(t, 1), 7));
   }
 
   calendarWrap.style.display = 'block';

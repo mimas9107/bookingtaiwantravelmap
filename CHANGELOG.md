@@ -3,12 +3,18 @@ name:          "CHANGELOG.md"
 description:   "合歡山松雪樓空房查詢工具 — 版本變更紀錄"
 created_date:  "2026/06/15 16:30:00"
 modified_date: "2026/06/25 18:00:00"
-project_version: "2.3.1"
-document_version: "2.2.1"
-agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free','gemini cli/current_agent','opencode/minimax-m2.5']
+project_version: "2.3.2"
+document_version: "2.2.2"
+agent_sign: ['human/name','opencode/big-pickle','opencode/deepseek-v4-flash-free','gemini cli/current_agent','opencode/minimax-m2.5','opencode/deepseek-v4-flash-free']
 ---
 
 # 版本變更紀錄
+
+## v2.3.2 (2026-06-25)
+
+### 🐛 修復 — 查詢起始日期行為
+
+- `app.js`: 修正 `loadCache()` 不再覆蓋日期輸入框為快取日期，改為固定帶入明天起算、退房 +7 天；月曆仍顯示快取資料
 
 ## v2.3.1 (2026-06-25)
 

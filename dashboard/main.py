@@ -14,6 +14,8 @@ from dashboard.scraper import BookingScraper
 from dashboard.database import Database, DB_PATH
 from dashboard.bot import telegram as bot
 
+logger = logging.getLogger("uvicorn")
+
 def _get_git_commit() -> str:
     try:
         commit = subprocess.check_output(
