@@ -57,23 +57,15 @@
     </div>
   </div>
 
-  <div class="detail-panel" id="detailPanel">
-    <div class="dp-header">
-      <span id="detailDate"></span>
-      <span id="detailStatus"></span>
-    </div>
-    <div class="dp-body" id="detailBody"></div>
-  </div>
+   <div class="detail-panel" id="detailPanel">
+     <div class="dp-header">
+       <span id="detailDate"></span>
+       <span id="detailStatus"></span>
+     </div>
+     <div class="dp-body" id="detailBody"></div>
+   </div>
 
-  <div class="db-tools">
-    <span class="db-tools-label">&#x1F4BE; 資料庫</span>
-    <button id="dbExportBtn" title="下載 scans.db">&#x2B07; 下載</button>
-    <button id="dbImportBtn" title="上傳 .db 取代目前資料庫">&#x2B06; 上傳</button>
-    <input type="file" id="dbFileInput" accept=".db" style="display:none">
-    <span class="db-tools-status" id="dbToolsStatus"></span>
-  </div>
-
-  <div class="profile-panel" id="profilePanel">
+    <div class="profile-panel" id="profilePanel">
     <div class="profile-header" id="profileToggle">
       <span>&#x1F464; 設定訂房資料</span>
       <span class="profile-arrow">&#x25B6;</span>
@@ -145,8 +137,16 @@
         </div>
         <p class="profile-hint">若無法拖曳，可手動複製下方代碼，新增書籤時貼到網址欄：</p>
         <textarea id="pf_bookmarkletCode" readonly rows="3"></textarea>
-      </div>
-    </div>
+       </div>
+     </div>
+   </div>
+
+  <div class="db-tools">
+    <span class="db-tools-label">&#x1F4BE; 資料庫</span>
+    <button id="dbExportBtn" title="下載 scans.db">&#x2B07; 下載</button>
+    <button id="dbImportBtn" title="上傳 .db 取代目前資料庫">&#x2B06; 上傳</button>
+    <input type="file" id="dbFileInput" accept=".db" style="display:none">
+    <span class="db-tools-status" id="dbToolsStatus"></span>
   </div>
 </div>
 
